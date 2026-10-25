@@ -84,9 +84,9 @@
           </button>
         </div>
 
-        <button onclick="cargarViajeEmpleado(empleadoActualId); cargarListaEmpleados();" title="Sincronizar cambios desde la app móvil" class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 shadow-sm flex items-center space-x-1.5">
-          <i class="fa-solid fa-arrows-rotate text-emerald-600"></i>
-          <span class="hidden sm:inline">Sincronizar en Vivo</span>
+        <button id="btn-sincronizar-global" onclick="sincronizarTodoEnVivo(this)" title="Sincronizar cambios desde la app móvil" class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all bg-white hover:bg-slate-50 active:scale-95 text-slate-700 border border-slate-200 shadow-sm flex items-center space-x-1.5 cursor-pointer select-none">
+          <i id="icono-sincronizar" class="fa-solid fa-arrows-rotate text-emerald-600 transition-transform"></i>
+          <span id="texto-sincronizar" class="hidden sm:inline">Sincronizar en Vivo</span>
         </button>
       </div>
 
@@ -1024,6 +1024,70 @@
       sesionDesbloqueada = false;
       if (liquidacionData) renderizarTodo(liquidacionData);
       renderizarSelectorEmpleados(catalogoEmpleados);
+    }
+
+    // Sincronización Manual en Vivo con Feedback
+    async function sincronizarTodoEnVivo(btn) {
+      const icono = document.getElementById('icono-sincronizar') || (btn ? btn.querySelector('i') : null);
+      const texto = document.getElementById('texto-sincronizar') || (btn ? btn.querySelector('span') : null);
+
+      if (icono) icono.classList.add('fa-spin');
+      if (texto) texto.textContent = 'Sincronizando...';
+      if (btn) btn.disabled = true;
+
+      try {
+        // 1. Recargar catálogo público de colaboradores
+        await cargarListaEmpleados();
+
+        // 2. Si hay un empleado seleccionado, recargar su liquidación, comprobantes y métricas
+        if (empleadoActualId) {
+          await cargarViajeEmpleado(empleadoActualId);
+        }
+
+        // 3. Si estamos en modo admin, recargar lista admin y sub-vista de movimientos
+        if (adminToken) {
+          await cargarUsuariosAdmin();
+          if (colaboradorInspeccionadoId) {
+            await cargarMovimientosColaboradorAdmin(colaboradorInspeccionadoId);
+          }
+        }
+
+        mostrarToastSincronizacion('¡Datos sincronizados en tiempo real!');
+        if (texto) texto.textContent = '✓ Actualizado';
+      } catch (err) {
+        console.error('Error al sincronizar:', err);
+        mostrarToastSincronizacion('Error al conectar con el servidor', true);
+        if (texto) texto.textContent = 'Reintentar';
+      } finally {
+        setTimeout(() => {
+          if (icono) icono.classList.remove('fa-spin');
+          if (texto) texto.textContent = 'Sincronizar en Vivo';
+          if (btn) btn.disabled = false;
+        }, 1200);
+      }
+    }
+
+    function mostrarToastSincronizacion(mensaje, esError = false) {
+      let toast = document.getElementById('toast-sincronizacion');
+      if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'toast-sincronizacion';
+        document.body.appendChild(toast);
+      }
+
+      toast.className = `fixed bottom-5 right-5 z-50 px-4 py-3 rounded-2xl text-xs font-bold shadow-elevated flex items-center space-x-2 transition-all duration-300 transform ${
+        esError ? 'bg-rose-600 text-white border border-rose-500' : 'bg-slate-900 text-white border border-slate-700'
+      }`;
+      toast.innerHTML = `<i class="fa-solid ${esError ? 'fa-triangle-exclamation text-amber-300' : 'fa-circle-check text-emerald-400'}"></i><span>${mensaje}</span>`;
+
+      // Animar entrada suave
+      toast.style.opacity = '1';
+      toast.style.transform = 'translateY(0)';
+
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(20px)';
+      }, 2500);
     }
 
     // Control de Pestañas
