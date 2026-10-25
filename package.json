@@ -1,0 +1,18 @@
+{
+  "name": "jlg-facturacion-portal",
+  "version": "2.5.0",
+  "description": "Jlg Facturacion - Portal Web y API REST de Viaticos y Comprobaciones CFDI 4.0 Mexico",
+  "main": "app.js",
+  "type": "module",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "node --watch app.js"
+  },
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "express": "^4.21.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

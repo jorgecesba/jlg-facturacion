@@ -1,0 +1,33 @@
+{
+  "emp-julian": [
+    {
+      "id": "63d324da-7fe1-4cf0-903c-2143fa39fe82",
+      "uuid": "A3E8B7C9-2F10-4A55-9C4D-7E6F890123AB",
+      "version": "4.0",
+      "total": 980,
+      "subTotal": 844.83,
+      "moneda": "MXN",
+      "fechaEmision": "2026-10-21T15:20:45",
+      "formaPago": "04",
+      "metodoPago": "PUE",
+      "serie": "FA",
+      "folio": "10842",
+      "rfcEmisor": "SGM150612AB1",
+      "nombreEmisor": "SERVICIOS GASTRONOMICOS DE MONTERREY SA DE CV",
+      "rfcReceptor": "GME980512ABC",
+      "nombreReceptor": "GRUPO MERCANTIL EMPRESARIAL SA DE CV",
+      "categoria": "ALIMENTOS",
+      "montoDeclarado": 980,
+      "estatus": "APROBADO",
+      "hashSha256": "4d3ab19cef293190af2f37fae6089cb0870ab8cb63d83954b9b6c3ba0094e3cb",
+      "fechaRegistro": "2026-10-25T23:10:58.352Z",
+      "deducible": 0,
+      "excedente": 980,
+      "motivoAdmin": "Aprobado por el Administrador.",
+      "fechaRevisionAdmin": "2026-10-25T23:12:49.884Z"
+    }
+  ],
+  "emp-sandra": [],
+  "emp-angel": [],
+  "emp-1e3afff7": []
+}

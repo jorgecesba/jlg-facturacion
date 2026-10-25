@@ -1,0 +1,87 @@
+[
+  {
+    "id": "emp-julian",
+    "nombre": "Julián Alberto López Morales",
+    "email": "julian.lopez@grupomercantil.com.mx",
+    "claveAcceso": "JALM-2026",
+    "rfc": "LOMJ880914HC3",
+    "puesto": "Gerente de Operaciones y Logística",
+    "departamento": "Operaciones",
+    "estatus": "ACTIVO",
+    "iniciales": "JL",
+    "avatarGradient": "from-emerald-600 to-teal-800",
+    "viaje": {
+      "id": "via-2026-0042",
+      "folio": "VIA-2026-0042",
+      "motivo": "Auditoría a Centro de Distribución y Alianzas de Transporte",
+      "destino": "Monterrey, Nuevo León",
+      "esNacional": true,
+      "fechaInicio": "2026-10-20",
+      "fechaFin": "2026-10-22",
+      "diasViaje": 3,
+      "anticipoOtorgado": 6000
+    }
+  },
+  {
+    "id": "emp-sandra",
+    "nombre": "Sandra Urquilla Rosales",
+    "email": "sandra.urquilla@grupomercantil.com.mx",
+    "claveAcceso": "SUR-2026",
+    "rfc": "UROS920318M14",
+    "puesto": "Directora de Expansión Comercial",
+    "departamento": "Ventas Corporativas",
+    "estatus": "ACTIVO",
+    "iniciales": "SU",
+    "avatarGradient": "from-indigo-600 to-violet-800",
+    "viaje": {
+      "id": "via-2026-0058",
+      "motivo": "Cierre de Contratos Marco con Cuentas Clave de Occidente",
+      "destino": "Guadalajara, Jalisco",
+      "esNacional": true,
+      "fechaInicio": "2026-10-18",
+      "fechaFin": "2026-10-21",
+      "diasViaje": 4,
+      "anticipoOtorgado": 8500
+    }
+  },
+  {
+    "id": "emp-angel",
+    "nombre": "Ángel Miramontes",
+    "email": "angel.miramontes@grupomercantil.com.mx",
+    "claveAcceso": "AM-2026",
+    "rfc": "MIRA851120AB9",
+    "puesto": "Auditor Contable y Fiscal Senior",
+    "departamento": "Contraloría y Finanzas",
+    "estatus": "ACTIVO",
+    "iniciales": "AM",
+    "avatarGradient": "from-amber-600 to-orange-800",
+    "viaje": {
+      "id": "via-2026-0063",
+      "motivo": "Auditoría Fiscal de Activos y Control de Sucursal Sureste",
+      "destino": "Cancún, Quintana Roo",
+      "esNacional": true,
+      "fechaInicio": "2026-10-15",
+      "fechaFin": "2026-10-19",
+      "diasViaje": 5,
+      "anticipoOtorgado": 12000
+    }
+  },
+  {
+    "id": "emp-1e3afff7",
+    "nombre": "Jorge Luis Lopez",
+    "email": "jorgellg012333@gmail.com",
+    "claveAcceso": "JLPMEXBE",
+    "rfc": "LOGJ010405V78",
+    "puesto": "IT",
+    "departamento": "IT",
+    "estatus": "ACTIVO",
+    "iniciales": "JL",
+    "avatarGradient": "from-blue-600 to-cyan-800",
+    "viaje": {
+      "destino": "QUERETARO,QRO",
+      "anticipoOtorgado": 5000,
+      "fechaInicio": "2026-10-20",
+      "fechaFin": "2026-10-24"
+    }
+  }
+]

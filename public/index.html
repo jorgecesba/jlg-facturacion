@@ -1,0 +1,1952 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jlg Facturacion | Portal de Viáticos México</title>
+  
+  <!-- Tipografía Humana y Moderna: Plus Jakarta Sans & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Font Awesome 6 Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          boxShadow: {
+            'soft-card': '0 12px 30px -4px rgba(16, 24, 40, 0.08), 0 4px 12px -2px rgba(16, 24, 40, 0.04)',
+            'elevated': '0 20px 35px -8px rgba(15, 23, 42, 0.12), 0 8px 16px -4px rgba(15, 23, 42, 0.06)',
+            'glow-emerald': '0 8px 24px -4px rgba(16, 185, 129, 0.25)',
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      background-color: #f8fafc;
+      background-image: radial-gradient(at 0% 0%, rgba(204, 251, 241, 0.35) 0px, transparent 50%),
+                        radial-gradient(at 100% 100%, rgba(254, 243, 199, 0.3) 0px, transparent 50%);
+      background-attachment: fixed;
+    }
+    @media print {
+      body * { visibility: hidden; }
+      #modal-impresion, #modal-impresion * { visibility: visible; }
+      #modal-impresion { position: absolute; left: 0; top: 0; width: 100%; }
+    }
+  </style>
+</head>
+<body class="text-slate-800 min-h-screen flex flex-col font-sans antialiased selection:bg-emerald-100 selection:text-emerald-900">
+
+  <!-- BARRA DE NAVEGACIÓN SUPERIOR -->
+  <nav class="bg-white/85 backdrop-blur-md border-b border-slate-200/80 sticky top-0 z-40 transition-all">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-wrap items-center justify-between gap-4">
+      
+      <!-- Logo y Nombre de la Empresa -->
+      <div class="flex items-center space-x-3.5">
+        <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-emerald-800 to-teal-600 flex items-center justify-center text-white shadow-soft-card">
+          <i class="fa-solid fa-receipt text-lg"></i>
+        </div>
+        <div>
+          <div class="flex items-center space-x-2">
+            <span class="text-sm font-bold tracking-tight text-slate-900">Jlg Facturacion</span>
+            <span class="bg-emerald-50 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-full border border-emerald-200">
+              CFDI 4.0 SAT
+            </span>
+          </div>
+          <span class="text-xs text-slate-500 font-medium">Grupo Mercantil Empresarial S.A. de C.V.</span>
+        </div>
+      </div>
+
+      <!-- PESTAÑAS PRINCIPALES DEL PORTAL Y BOTÓN SINCRONIZAR -->
+      <div class="flex items-center space-x-2">
+        <div class="flex items-center bg-slate-100/90 rounded-2xl p-1 border border-slate-200/80">
+          <button id="tab-btn-viaticos" onclick="cambiarPestana('viaticos')" class="px-4 py-1.5 rounded-xl text-xs font-bold transition-all bg-white text-slate-900 shadow-sm">
+            <i class="fa-solid fa-plane-departure mr-1.5 text-emerald-600"></i> Comprobación de Viáticos
+          </button>
+
+          <!-- Pestaña exclusiva de Administración (Oculta por defecto para usuarios normales) -->
+          <button id="tab-btn-admin" onclick="cambiarPestana('admin')" class="hidden px-4 py-1.5 rounded-xl text-xs font-bold transition-all text-slate-600 hover:text-slate-900">
+            <i class="fa-solid fa-shield-halved mr-1.5 text-indigo-600"></i> Administración de Usuarios
+            <span class="ml-1.5 bg-indigo-100 text-indigo-800 text-[9px] px-1.5 py-0.2 rounded-full font-extrabold uppercase">Admin</span>
+          </button>
+        </div>
+
+        <button onclick="cargarViajeEmpleado(empleadoActualId); cargarListaEmpleados();" title="Sincronizar cambios desde la app móvil" class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 shadow-sm flex items-center space-x-1.5">
+          <i class="fa-solid fa-arrows-rotate text-emerald-600"></i>
+          <span class="hidden sm:inline">Sincronizar en Vivo</span>
+        </button>
+      </div>
+
+      <!-- CONTROLES DE SESIÓN -->
+      <div class="flex items-center space-x-3">
+        <!-- ESTADO: NO AUTENTICADO COMO ADMIN -->
+        <div id="contenedor-login-trigger">
+          <button onclick="abrirModalLoginAdmin()" class="bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 text-xs font-bold px-3.5 py-2 rounded-xl border border-slate-200 shadow-sm flex items-center space-x-2 transition">
+            <i class="fa-solid fa-lock text-slate-400"></i>
+            <span>Acceso Administrador</span>
+          </button>
+        </div>
+
+        <!-- ESTADO: AUTENTICADO COMO ADMIN -->
+        <div id="contenedor-admin-badge" class="hidden flex items-center space-x-2">
+          <div class="bg-indigo-50 border border-indigo-200 text-indigo-900 text-xs font-semibold px-3 py-1.5 rounded-xl flex items-center space-x-2">
+            <span class="w-2 h-2 rounded-full bg-indigo-600 animate-pulse"></span>
+            <span class="font-mono font-bold" id="label-admin-username">DamianSpears_Owner</span>
+          </div>
+          <button onclick="cerrarSesionAdmin()" title="Cerrar sesión de administrador" class="bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-bold px-3 py-2 rounded-xl transition flex items-center space-x-1.5">
+            <i class="fa-solid fa-arrow-right-from-bracket"></i>
+            <span class="hidden sm:inline">Salir</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </nav>
+
+  <!-- ========================================================================= -->
+  <!-- VISTA 1: COMPROBACIÓN DE VIÁTICOS (ACCESIBLE PARA COLABORADORES)          -->
+  <!-- ========================================================================= -->
+  <main id="vista-viaticos" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-7 flex-1 w-full space-y-7">
+
+    <!-- SECCIÓN 1: SELECTOR VISUAL DE COLABORADORES CON CLAVE ÚNICA -->
+    <div id="seccion-empleados" class="bg-white/90 backdrop-blur-sm rounded-3xl p-6 border border-slate-200/90 shadow-soft-card">
+      <div class="flex flex-col md:flex-row md:items-center justify-between pb-4 border-b border-slate-100 gap-2">
+        <div>
+          <h2 class="text-base font-bold text-slate-900 flex items-center space-x-2">
+            <i class="fa-solid fa-users-viewfinder text-emerald-600"></i>
+            <span>¿Quién está comprobando viáticos hoy?</span>
+          </h2>
+          <p class="text-xs text-slate-500 mt-0.5">
+            Selecciona al colaborador para cargar su viaje activo, presupuesto de viáticos y comprobantes:
+          </p>
+        </div>
+        <span class="text-[11px] font-semibold text-slate-400 bg-slate-50 px-3 py-1 rounded-full border border-slate-200/60 self-start md:self-auto">
+          Acceso rápido por clave única
+        </span>
+      </div>
+
+      <!-- Tarjetas de los Colaboradores (generadas dinámicamente) -->
+      <div id="grid-empleados-selector" class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-5">
+        <!-- Rellenado dinámico por JS -->
+      </div>
+    </div>
+
+    <!-- SECCIÓN 2: TARJETAS SUPERIORES CON SOMBREADO ELEGANTE Y PROFUNDIDAD -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+      
+      <!-- FICHA DEL VIAJE AUTORIZADO (4 COLS) -->
+      <div class="lg:col-span-4 bg-white/95 rounded-3xl p-6 border border-slate-200/80 shadow-soft-card hover:shadow-elevated transition-shadow duration-300 flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between pb-3.5 border-b border-slate-100">
+            <div class="flex items-center space-x-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+              <span class="text-xs font-bold text-slate-700 tracking-wide uppercase">Comisión Autorizada</span>
+            </div>
+            <span id="label-folio-viaje" class="font-mono text-xs font-bold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-lg">VIA-2026-0042</span>
+          </div>
+
+          <div class="mt-4 space-y-3 text-xs">
+            <div>
+              <span class="text-slate-400 block text-[11px] font-medium">Motivo:</span>
+              <p id="label-motivo-viaje" class="font-semibold text-slate-800 text-sm mt-0.5 leading-snug">
+                Supervisión y Auditoría
+              </p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2 pt-1">
+              <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                <span class="text-slate-400 block text-[10px]">Destino:</span>
+                <strong id="label-destino-viaje" class="text-slate-800 text-xs">Monterrey, NL</strong>
+              </div>
+              <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                <span class="text-slate-400 block text-[10px]">RFC Colaborador:</span>
+                <strong id="label-rfc-colaborador" class="font-mono text-slate-800 text-xs">LOMJ880914HC3</strong>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between pt-1 text-slate-600">
+              <span><i class="fa-regular fa-calendar-check text-emerald-600 mr-1.5"></i> Período:</span>
+              <strong id="label-fechas-viaje" class="font-mono text-slate-800">20/Oct/2026 al 22/Oct/2026</strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-5 pt-3.5 border-t border-slate-100 flex items-center justify-between text-xs">
+          <span class="text-slate-500">Tope Alimentos LISR (Art. 28):</span>
+          <span class="font-mono font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200/80">
+            $750.00 MXN / día
+          </span>
+        </div>
+      </div>
+
+      <!-- MÉTRICAS FINANCIERAS CON SOMBRAS ELEVADAS (8 COLS) -->
+      <div class="lg:col-span-8 grid grid-cols-2 sm:grid-cols-4 gap-4">
+        
+        <!-- CARD 1: ANTICIPO OTORGADO -->
+        <div class="bg-gradient-to-b from-blue-50/70 to-white rounded-3xl p-5 border border-blue-100 shadow-soft-card hover:shadow-elevated transition-all flex flex-col justify-between">
+          <div class="flex items-center justify-between text-blue-800">
+            <span class="text-[11px] font-bold uppercase tracking-wider">Anticipo</span>
+            <div class="w-8 h-8 rounded-xl bg-blue-100/80 flex items-center justify-center text-blue-700">
+              <i class="fa-solid fa-money-bill-transfer text-xs"></i>
+            </div>
+          </div>
+          <div class="mt-4">
+            <div id="metric-anticipo" class="text-2xl sm:text-3xl font-extrabold text-blue-950 font-mono tracking-tight">$6,000.00</div>
+            <span class="text-[11px] text-blue-600 font-medium block mt-1">Recibido vía nómina</span>
+          </div>
+        </div>
+
+        <!-- CARD 2: DEDUCIBLE AUTORIZADO (LISR) -->
+        <div class="bg-gradient-to-b from-emerald-50/70 to-white rounded-3xl p-5 border border-emerald-200/80 shadow-soft-card hover:shadow-elevated transition-all flex flex-col justify-between">
+          <div class="flex items-center justify-between text-emerald-800">
+            <span class="text-[11px] font-bold uppercase tracking-wider">Deducible LISR</span>
+            <div class="w-8 h-8 rounded-xl bg-emerald-100/80 flex items-center justify-center text-emerald-700">
+              <i class="fa-solid fa-check-double text-xs"></i>
+            </div>
+          </div>
+          <div class="mt-4">
+            <div id="metric-deducible" class="text-2xl sm:text-3xl font-extrabold text-emerald-950 font-mono tracking-tight">$0.00</div>
+            <span class="text-[11px] text-emerald-700 font-medium block mt-1">Anexo 20 y Art. 28 SAT</span>
+          </div>
+        </div>
+
+        <!-- CARD 3: EXCEDENTE NO DEDUCIBLE -->
+        <div class="bg-gradient-to-b from-amber-50/70 to-white rounded-3xl p-5 border border-amber-200/80 shadow-soft-card hover:shadow-elevated transition-all flex flex-col justify-between">
+          <div class="flex items-center justify-between text-amber-800">
+            <span class="text-[11px] font-bold uppercase tracking-wider">Excedente</span>
+            <div class="w-8 h-8 rounded-xl bg-amber-100/80 flex items-center justify-center text-amber-700">
+              <i class="fa-solid fa-triangle-exclamation text-xs"></i>
+            </div>
+          </div>
+          <div class="mt-4">
+            <div id="metric-excedente" class="text-2xl sm:text-3xl font-extrabold text-amber-950 font-mono tracking-tight">$0.00</div>
+            <span class="text-[11px] text-amber-700 font-medium block mt-1">Excede política o tope</span>
+          </div>
+        </div>
+
+        <!-- CARD 4: SALDO FINAL -->
+        <div id="metric-saldo-container" class="bg-gradient-to-b from-slate-100 to-white rounded-3xl p-5 border border-slate-300 shadow-soft-card hover:shadow-elevated transition-all flex flex-col justify-between">
+          <div class="flex items-center justify-between text-slate-700">
+            <span id="metric-saldo-label" class="text-[11px] font-bold uppercase tracking-wider">Por Reintegrar</span>
+            <div class="w-8 h-8 rounded-xl bg-slate-200/80 flex items-center justify-center text-slate-800">
+              <i class="fa-solid fa-scale-balanced text-xs"></i>
+            </div>
+          </div>
+          <div class="mt-4">
+            <div id="metric-saldo" class="text-2xl sm:text-3xl font-extrabold text-slate-900 font-mono tracking-tight">$6,000.00</div>
+            <span id="metric-saldo-desc" class="text-[11px] text-slate-600 font-medium block mt-1">A devolver a la empresa</span>
+          </div>
+        </div>
+
+        <!-- Barra inferior de acciones del resumen -->
+        <div class="col-span-2 sm:col-span-4 bg-white/70 rounded-2xl p-3 border border-slate-200/70 flex flex-wrap items-center justify-between gap-3 shadow-sm">
+          <div class="flex items-center space-x-2 text-xs text-slate-600 pl-1">
+            <i class="fa-solid fa-shield-halved text-emerald-600"></i>
+            <span id="label-estado-privacidad-montos">Privacidad activa: Montos confidenciales protegidos</span>
+          </div>
+          <div class="flex items-center space-x-2">
+            <button onclick="toggleVisibilidadMontos()" id="btn-toggle-montos" class="bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold px-3 py-1.5 rounded-xl border border-slate-200 shadow-sm flex items-center space-x-1.5 transition">
+              <i id="btn-toggle-montos-icon" class="fa-solid fa-eye-slash text-slate-400"></i>
+              <span id="btn-toggle-montos-texto">Ocultar montos</span>
+            </button>
+            <button onclick="abrirModalImpresion()" class="bg-slate-900 hover:bg-slate-800 text-white px-4 py-2 rounded-xl text-xs font-bold flex items-center space-x-2 shadow-sm hover:shadow transition">
+              <i class="fa-solid fa-print text-amber-400"></i>
+              <span>Ver Hoja de Liquidación</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- SECCIÓN 3: SIMULADOR DE PRUEBAS RÁPIDAS (1-CLICK) -->
+    <div class="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white rounded-3xl p-5 sm:p-6 shadow-elevated border border-slate-700/80">
+      <div class="flex items-center space-x-2.5 pb-3 border-b border-slate-700/60">
+        <span class="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-sm">
+          <i class="fa-solid fa-bolt"></i>
+        </span>
+        <div>
+          <h3 class="text-sm font-bold text-white tracking-wide">Pruebas Rápidas de Validación CFDI 4.0</h3>
+          <p class="text-xs text-slate-400">Casos preconfigurados de validación fiscal del SAT:</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 mt-4">
+        <button onclick="cargarEscenario('valido', 720.00, 'ALIMENTOS')" class="bg-slate-800/80 hover:bg-emerald-950/70 hover:border-emerald-500/80 border border-slate-700 p-3 rounded-2xl text-left transition-all duration-200 group flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between text-xs font-bold text-white group-hover:text-emerald-300">
+              <span>1. Factura Válida</span>
+              <i class="fa-solid fa-circle-check text-emerald-400 text-xs"></i>
+            </div>
+            <p class="text-[11px] text-slate-300 mt-1 leading-snug">Comida $720.00 MXN autorizada.</p>
+          </div>
+          <span class="text-[10px] text-emerald-400 font-mono mt-2 font-semibold">Pasa 100%</span>
+        </button>
+
+        <button onclick="cargarEscenario('discrepancia_monto', 1500.00, 'HOSPEDAJE')" class="bg-slate-800/80 hover:bg-rose-950/70 hover:border-rose-500/80 border border-slate-700 p-3 rounded-2xl text-left transition-all duration-200 group flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between text-xs font-bold text-white group-hover:text-rose-300">
+              <span>2. Discrepancia</span>
+              <i class="fa-solid fa-not-equal text-rose-400 text-xs"></i>
+            </div>
+            <p class="text-[11px] text-slate-300 mt-1 leading-snug">Declara $1,500 vs $986 del XML.</p>
+          </div>
+          <span class="text-[10px] text-rose-400 font-mono mt-2 font-semibold">Difiere monto</span>
+        </button>
+
+        <button onclick="cargarEscenario('fecha_invalida', 522.00, 'ALIMENTOS')" class="bg-slate-800/80 hover:bg-rose-950/70 hover:border-rose-500/80 border border-slate-700 p-3 rounded-2xl text-left transition-all duration-200 group flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between text-xs font-bold text-white group-hover:text-rose-300">
+              <span>3. Fecha Inválida</span>
+              <i class="fa-solid fa-calendar-xmark text-rose-400 text-xs"></i>
+            </div>
+            <p class="text-[11px] text-slate-300 mt-1 leading-snug">Factura fuera del período de viaje.</p>
+          </div>
+          <span class="text-[10px] text-rose-400 font-mono mt-2 font-semibold">Fuera de viaje</span>
+        </button>
+
+        <button onclick="cargarEscenario('rfc_incorrecto', 348.00, 'TRANSPORTE')" class="bg-slate-800/80 hover:bg-rose-950/70 hover:border-rose-500/80 border border-slate-700 p-3 rounded-2xl text-left transition-all duration-200 group flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between text-xs font-bold text-white group-hover:text-rose-300">
+              <span>4. RFC Erróneo</span>
+              <i class="fa-solid fa-id-badge text-rose-400 text-xs"></i>
+            </div>
+            <p class="text-[11px] text-slate-300 mt-1 leading-snug">Factura a nombre de otra entidad.</p>
+          </div>
+          <span class="text-[10px] text-rose-400 font-mono mt-2 font-semibold">No deducible</span>
+        </button>
+
+        <button onclick="cargarEscenario('excedente_lisr', 1300.00, 'ALIMENTOS')" class="bg-slate-800/80 hover:bg-amber-950/70 hover:border-amber-500/80 border border-slate-700 p-3 rounded-2xl text-left transition-all duration-200 group flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between text-xs font-bold text-white group-hover:text-amber-300">
+              <span>5. Excede LISR</span>
+              <i class="fa-solid fa-divide text-amber-400 text-xs"></i>
+            </div>
+            <p class="text-[11px] text-slate-300 mt-1 leading-snug">Alimentos de $1,300 ($750 tope).</p>
+          </div>
+          <span class="text-[10px] text-amber-400 font-mono mt-2 font-semibold">Calcula tope</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- SECCIÓN 4: ÁREA DE CARGA Y DIAGNÓSTICO EN VIVO -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      
+      <!-- COLUMNA IZQUIERDA: FORMULARIO DE CARGA (5 COLS) -->
+      <div class="lg:col-span-5 bg-white rounded-3xl p-6 border border-slate-200/90 shadow-soft-card space-y-4">
+        <div class="border-b border-slate-100 pb-3">
+          <h3 class="text-sm font-bold text-slate-900 flex items-center space-x-2">
+            <i class="fa-solid fa-cloud-arrow-up text-emerald-600"></i>
+            <span>Cargar Comprobante XML</span>
+          </h3>
+          <p class="text-xs text-slate-500 mt-0.5">Sube tu factura digital emitida por el proveedor:</p>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1.5">Archivo .XML del CFDI:</label>
+          <div class="relative border-2 border-dashed border-slate-300 hover:border-emerald-500 rounded-2xl p-4 text-center bg-slate-50/60 hover:bg-emerald-50/20 transition cursor-pointer" onclick="document.getElementById('input-archivo-xml').click()">
+            <input type="file" id="input-archivo-xml" accept=".xml" onchange="leerArchivoLocal(this)" class="hidden">
+            <i class="fa-solid fa-file-code text-2xl text-slate-400 mb-1.5 block"></i>
+            <span id="badge-archivo-cargado" class="text-xs font-bold text-slate-700 block">
+              Haz clic para seleccionar o arrastra tu XML
+            </span>
+            <span class="text-[11px] text-slate-400 block mt-0.5">Compatible con CFDI 4.0 del SAT</span>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Monto que pagaste ($ MXN):</label>
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400 font-bold text-sm">$</span>
+            <input type="number" step="0.01" id="input-monto-declarado" placeholder="0.00" class="w-full pl-8 pr-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-mono font-bold focus:bg-white focus:ring-2 focus:ring-emerald-500 focus:outline-none transition">
+          </div>
+          <span class="text-[11px] text-slate-400 block mt-1">El sistema verificará que coincida exactamente con el total del SAT.</span>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Categoría del Gasto:</label>
+          <select id="select-categoria" class="w-full py-2.5 px-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:bg-white focus:ring-2 focus:ring-emerald-500 focus:outline-none transition">
+            <option value="ALIMENTOS">🍽️ Alimentos y Bebidas (Tope $750.00 diario)</option>
+            <option value="HOSPEDAJE">🏨 Hospedaje / Hotel (Deducible nacional)</option>
+            <option value="TRANSPORTE">✈️ Transporte / Taxis / Casetas</option>
+            <option value="GASOLINA">⛽ Gasolina (Tarjeta corporativa o monedero)</option>
+            <option value="DIVERSOS">📦 Gastos Diversos de Comisión</option>
+          </select>
+        </div>
+
+        <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200/80 flex items-start space-x-2.5">
+          <input type="checkbox" id="check-modo-flexible" checked class="mt-0.5 rounded text-emerald-600 focus:ring-emerald-500 w-4 h-4 cursor-pointer">
+          <label for="check-modo-flexible" class="text-[11px] text-slate-600 cursor-pointer">
+            <strong class="text-slate-800 block font-semibold">Modo Flexible para facturas reales</strong>
+            Permite probar cualquier XML real sin forzar el RFC o fecha del viaje demo.
+          </label>
+        </div>
+
+        <details class="text-xs">
+          <summary class="cursor-pointer text-slate-500 hover:text-slate-800 font-semibold select-none">
+            <i class="fa-solid fa-code text-[11px] mr-1"></i> Ver o pegar código XML manualmente
+          </summary>
+          <textarea id="textarea-xml" rows="4" placeholder="Pega el código XML aquí..." class="w-full mt-2 p-2.5 text-[11px] font-mono border border-slate-200 rounded-xl bg-slate-50 text-slate-700 focus:bg-white focus:outline-none"></textarea>
+        </details>
+
+        <button onclick="procesarValidacionXML()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-xl text-xs shadow-soft-card hover:shadow-glow-emerald flex items-center justify-center space-x-2 transition-all">
+          <i class="fa-solid fa-check"></i>
+          <span>Validar Comprobante contra SAT y Reglas</span>
+        </button>
+      </div>
+
+      <!-- COLUMNA DERECHA: DIAGNÓSTICO EN VIVO (7 COLS) -->
+      <div class="lg:col-span-7 bg-white rounded-3xl p-6 border border-slate-200/90 shadow-soft-card flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+            <div>
+              <h3 class="text-sm font-bold text-slate-900 flex items-center space-x-2">
+                <i class="fa-solid fa-clipboard-check text-blue-600"></i>
+                <span>Diagnóstico del Comprobante</span>
+              </h3>
+              <p class="text-xs text-slate-500 mt-0.5">Resultado de las validaciones fiscales del SAT:</p>
+            </div>
+            <span id="badge-estado-validacion" class="text-xs font-bold px-3 py-1 rounded-full bg-slate-100 text-slate-600 border border-slate-200">
+              Esperando comprobante
+            </span>
+          </div>
+
+          <div id="contenedor-diagnostico" class="mt-4 space-y-2.5">
+            <div class="text-center py-12 text-slate-400 text-xs">
+              <div class="w-12 h-12 rounded-2xl bg-slate-100 flex items-center justify-center mx-auto mb-3 text-slate-400">
+                <i class="fa-regular fa-file-lines text-xl"></i>
+              </div>
+              <strong class="block text-slate-600 text-sm mb-1">Ningún comprobante evaluado aún</strong>
+              Sube un XML o prueba uno de los botones rápidos arriba.
+            </div>
+          </div>
+        </div>
+
+        <div id="tarjeta-cfdi-extraido" class="hidden mt-4 p-4 bg-slate-50/80 rounded-2xl border border-slate-200 text-xs space-y-2">
+          <div class="font-bold text-slate-800 flex items-center justify-between">
+            <span class="flex items-center space-x-1.5">
+              <i class="fa-solid fa-receipt text-emerald-600"></i>
+              <span>Datos Extraídos del XML Oficial:</span>
+            </span>
+            <span id="cfdi-extraido-uuid" class="font-mono text-[10px] text-slate-500 bg-white px-2 py-0.5 rounded border"></span>
+          </div>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-[11px] pt-1">
+            <div><span class="text-slate-400 block text-[10px]">Proveedor:</span> <strong id="cfdi-extraido-emisor" class="text-slate-800 truncate block"></strong></div>
+            <div><span class="text-slate-400 block text-[10px]">Fecha Emisión:</span> <strong id="cfdi-extraido-fecha" class="text-slate-800"></strong></div>
+            <div><span class="text-slate-400 block text-[10px]">Pago:</span> <strong id="cfdi-extraido-pago" class="text-slate-800"></strong></div>
+            <div><span class="text-slate-400 block text-[10px]">Total en XML:</span> <strong id="cfdi-extraido-total" class="text-emerald-700 text-xs font-mono font-bold"></strong></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- SECCIÓN 5: TABLA DE GASTOS COMPROBADOS -->
+    <div class="bg-white rounded-3xl border border-slate-200/90 shadow-soft-card overflow-hidden">
+      <div class="p-5 border-b border-slate-100 flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h3 class="text-sm font-bold text-slate-900 flex items-center space-x-2">
+            <i class="fa-solid fa-list-ul text-emerald-600"></i>
+            <span>Comprobantes Aceptados para <span id="label-tabla-empleado" class="text-emerald-800">Julián Alberto López</span></span>
+          </h3>
+          <p class="text-xs text-slate-500 mt-0.5">Facturas electrónicas que ya forman parte de esta liquidación:</p>
+        </div>
+        <span class="text-xs bg-slate-100 text-slate-700 font-bold px-3 py-1 rounded-full border border-slate-200" id="badge-total-comprobantes">
+          0 comprobantes
+        </span>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse text-xs">
+          <thead>
+            <tr class="bg-slate-50/70 text-slate-500 uppercase font-bold text-[10px] tracking-wider border-b border-slate-100">
+              <th class="py-3 px-4">Folio Fiscal (UUID) / Proveedor</th>
+              <th class="py-3 px-4">Categoría</th>
+              <th class="py-3 px-4">Fecha CFDI</th>
+              <th class="py-3 px-4 text-right">Total Factura</th>
+              <th class="py-3 px-4 text-right">Deducible LISR</th>
+              <th class="py-3 px-4 text-right">Excedente</th>
+              <th class="py-3 px-4 text-center">Estatus SAT</th>
+            </tr>
+          </thead>
+          <tbody id="tabla-comprobantes-body" class="divide-y divide-slate-100 font-mono text-[11px]">
+            <!-- Dinámico -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+
+  <!-- ========================================================================= -->
+  <!-- VISTA 2: ADMINISTRACIÓN DE USUARIOS (EXCLUSIVA PARA EL ADMINISTRADOR)      -->
+  <!-- ========================================================================= -->
+  <main id="vista-admin" class="hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-7 flex-1 w-full space-y-6">
+    
+    <!-- SUB-VISTA 1: CATÁLOGO DE USUARIOS Y CONTROL GENERAL -->
+    <div id="admin-subvista-usuarios" class="space-y-6">
+      <!-- ENCABEZADO DE ADMINISTRACIÓN -->
+      <div class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white rounded-3xl p-6 sm:p-8 shadow-elevated border border-indigo-900/50 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <div class="flex items-center space-x-2 mb-2">
+            <span class="bg-indigo-500/20 text-indigo-300 text-[10px] font-extrabold px-3 py-1 rounded-full uppercase tracking-wider border border-indigo-400/30">
+              Panel Exclusivo de Control
+            </span>
+            <span class="text-xs text-slate-400">| Acceso Admin Autorizado</span>
+          </div>
+          <h2 class="text-xl sm:text-2xl font-black tracking-tight text-white">
+            Administración de Usuarios y Políticas de Viáticos
+          </h2>
+          <p class="text-xs text-slate-300 mt-1 max-w-2xl">
+            Gestiona altas, modificaciones de colaboradores, claves únicas de acceso a viáticos y asignación presupuestal de comisiones.
+          </p>
+        </div>
+
+        <button onclick="abrirModalUsuario(false)" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-5 py-3 rounded-2xl shadow-elevated flex items-center space-x-2 transition self-start md:self-auto">
+          <i class="fa-solid fa-user-plus"></i>
+          <span>Dar de Alta Nuevo Colaborador</span>
+        </button>
+      </div>
+
+      <!-- TARJETAS DE CONTROL ADMIN -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-soft-card flex items-center justify-between">
+          <div>
+            <span class="text-[11px] font-bold text-slate-400 uppercase block">Total de Colaboradores</span>
+            <span class="text-2xl font-black text-slate-900 font-mono mt-1 block" id="admin-metric-total">0</span>
+          </div>
+          <div class="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-lg">
+            <i class="fa-solid fa-users"></i>
+          </div>
+        </div>
+
+        <div class="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-soft-card flex items-center justify-between">
+          <div>
+            <span class="text-[11px] font-bold text-slate-400 uppercase block">Colaboradores Activos</span>
+            <span class="text-2xl font-black text-emerald-800 font-mono mt-1 block" id="admin-metric-activos">0</span>
+          </div>
+          <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-lg">
+            <i class="fa-solid fa-user-check"></i>
+          </div>
+        </div>
+
+        <div class="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-soft-card flex items-center justify-between">
+          <div>
+            <span class="text-[11px] font-bold text-slate-400 uppercase block">Presupuesto Asignado en Viajes</span>
+            <span class="text-2xl font-black text-blue-900 font-mono mt-1 block" id="admin-metric-anticipos">$0.00</span>
+          </div>
+          <div class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center text-lg">
+            <i class="fa-solid fa-sack-dollar"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- TABLA DE GESTIÓN DE USUARIOS -->
+      <div class="bg-white rounded-3xl border border-slate-200/90 shadow-soft-card overflow-hidden">
+        <div class="p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <h3 class="text-sm font-bold text-slate-900 flex items-center space-x-2">
+              <i class="fa-solid fa-id-card text-indigo-600"></i>
+              <span>Catálogo Oficial de Colaboradores</span>
+            </h3>
+            <p class="text-xs text-slate-500 mt-0.5">Control de cuentas, claves únicas y destinos autorizados:</p>
+          </div>
+
+          <div class="relative w-full sm:w-64">
+            <input type="text" id="filtro-usuarios-admin" oninput="filtrarUsuariosAdmin(this.value)" placeholder="Buscar por nombre, RFC o correo..." class="w-full pl-9 pr-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-xs"></i>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse text-xs">
+            <thead>
+              <tr class="bg-slate-50/70 text-slate-500 uppercase font-bold text-[10px] tracking-wider border-b border-slate-100">
+                <th class="py-3 px-4">Colaborador</th>
+                <th class="py-3 px-4">RFC / Correo</th>
+                <th class="py-3 px-4">Puesto y Área</th>
+                <th class="py-3 px-4">Clave Única</th>
+                <th class="py-3 px-4">Destino y Anticipo</th>
+                <th class="py-3 px-4 text-center">Estatus</th>
+                <th class="py-3 px-4 text-right">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="tabla-admin-usuarios-body" class="divide-y divide-slate-100 font-sans text-xs">
+              <!-- Rellenado dinámico por JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- SUB-VISTA 2: INSPECCIÓN DETALLADA DE MOVIMIENTOS Y FACTURAS (ADMIN) -->
+    <div id="admin-subvista-movimientos" class="hidden space-y-6">
+      
+      <!-- BOTÓN VOLVER Y BADGE -->
+      <div class="flex items-center justify-between">
+        <button onclick="volverAUsuariosAdmin()" class="bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs px-4 py-2.5 rounded-2xl border border-slate-200 shadow-sm flex items-center space-x-2 transition">
+          <i class="fa-solid fa-arrow-left text-slate-400"></i>
+          <span>Volver al Catálogo de Colaboradores</span>
+        </button>
+        <div class="flex items-center space-x-2">
+          <span class="bg-emerald-100 text-emerald-800 text-[10px] font-extrabold px-3 py-1 rounded-full uppercase border border-emerald-200">
+            Auditoría Fiscal CFDI 4.0
+          </span>
+        </div>
+      </div>
+
+      <!-- FICHA DEL COLABORADOR Y SALDOS EN AUDITORÍA -->
+      <div class="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200/90 shadow-soft-card">
+        <div class="flex flex-col md:flex-row md:items-center justify-between pb-6 border-b border-slate-100 gap-4">
+          <div class="flex items-center space-x-4">
+            <div id="admin-colab-avatar" class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-800 text-white font-bold text-lg flex items-center justify-center shadow-md">
+              JL
+            </div>
+            <div>
+              <div class="flex items-center space-x-2">
+                <h3 id="admin-colab-nombre" class="text-lg font-black text-slate-900 leading-tight">Nombre del Colaborador</h3>
+                <span id="admin-colab-estatus-badge" class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-full border border-emerald-200">ACTIVO</span>
+              </div>
+              <p id="admin-colab-subtitulo" class="text-xs text-slate-500 mt-0.5">Puesto • Área</p>
+              <div class="flex flex-wrap items-center gap-3 mt-1.5 text-xs text-slate-600">
+                <span class="font-mono bg-slate-50 px-2 py-0.5 rounded border border-slate-200 text-slate-700 font-bold" id="admin-colab-rfc">RFC: --</span>
+                <span id="admin-colab-destino"><i class="fa-solid fa-plane-departure text-slate-400 mr-1"></i> Destino: --</span>
+                <span id="admin-colab-folio" class="font-mono text-slate-400">Folio: --</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-200/80 text-xs space-y-1 self-start md:self-auto">
+            <span class="text-slate-400 text-[11px] block">Clave confidencial asignada:</span>
+            <span id="admin-colab-clave" class="font-mono font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200 block text-center">
+              --
+            </span>
+          </div>
+        </div>
+
+        <!-- INDICADORES FINANCIEROS Y SALDO DE LIQUIDACIÓN -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6">
+          <div class="bg-blue-50/60 rounded-2xl p-4 border border-blue-100">
+            <span class="text-[10px] font-bold text-blue-700 uppercase block tracking-wider">Anticipo Otorgado</span>
+            <span id="admin-colab-anticipo" class="text-xl font-black text-blue-900 font-mono mt-1 block">$0.00</span>
+            <span class="text-[10px] text-blue-600 mt-0.5 block">Presupuesto inicial</span>
+          </div>
+
+          <div class="bg-slate-50 rounded-2xl p-4 border border-slate-100">
+            <span class="text-[10px] font-bold text-slate-500 uppercase block tracking-wider">Total Gastado</span>
+            <span id="admin-colab-gastado" class="text-xl font-black text-slate-800 font-mono mt-1 block">$0.00</span>
+            <span class="text-[10px] text-slate-400 mt-0.5 block">Suma de facturas</span>
+          </div>
+
+          <div class="bg-emerald-50/60 rounded-2xl p-4 border border-emerald-100">
+            <span class="text-[10px] font-bold text-emerald-700 uppercase block tracking-wider">Deducible SAT</span>
+            <span id="admin-colab-deducible" class="text-xl font-black text-emerald-800 font-mono mt-1 block">$0.00</span>
+            <span class="text-[10px] text-emerald-600 mt-0.5 block">Art. 28 LISR validado</span>
+          </div>
+
+          <div id="admin-colab-card-saldo" class="bg-slate-50 rounded-2xl p-4 border border-slate-200">
+            <span id="admin-colab-label-saldo" class="text-[10px] font-bold text-slate-600 uppercase block tracking-wider">Saldo por Reintegrar</span>
+            <span id="admin-colab-valor-saldo" class="text-xl font-black text-slate-900 font-mono mt-1 block">$0.00</span>
+            <span id="admin-colab-desc-saldo" class="text-[10px] text-slate-500 mt-0.5 block">A favor de empresa</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- TABLA DE FACTURAS Y CONTROL APROBAR / RECHAZAR -->
+      <div class="bg-white rounded-3xl border border-slate-200/90 shadow-soft-card overflow-hidden">
+        <div class="p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <h3 class="text-sm font-bold text-slate-900 flex items-center space-x-2">
+              <i class="fa-solid fa-receipt text-indigo-600"></i>
+              <span>Facturas Electrónicas de la Comisión</span>
+            </h3>
+            <p class="text-xs text-slate-500 mt-0.5">Revisa cada comprobante y define si es Aprobado o Rechazado:</p>
+          </div>
+          <span id="admin-colab-badge-count" class="text-xs font-bold bg-slate-100 text-slate-700 px-3 py-1 rounded-full border border-slate-200">
+            0 facturas
+          </span>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse text-xs">
+            <thead>
+              <tr class="bg-slate-50/70 text-slate-500 uppercase font-bold text-[10px] tracking-wider border-b border-slate-100">
+                <th class="py-3 px-4">Proveedor / Folio Fiscal (UUID)</th>
+                <th class="py-3 px-4">Categoría</th>
+                <th class="py-3 px-4">Fecha CFDI</th>
+                <th class="py-3 px-4 text-right">Total</th>
+                <th class="py-3 px-4 text-right">Deducible</th>
+                <th class="py-3 px-4 text-center">Estatus Admin</th>
+                <th class="py-3 px-4 text-right">Acción</th>
+              </tr>
+            </thead>
+            <tbody id="tabla-admin-movimientos-body" class="divide-y divide-slate-100 font-sans text-xs">
+              <!-- Rellenado dinámico por JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+
+  <!-- ========================================================================= -->
+  <!-- MODALES: LOGIN ADMIN, CREAR/EDITAR USUARIO, CLAVE RÁPIDA E IMPRESIÓN       -->
+  <!-- ========================================================================= -->
+
+  <!-- MODAL: LOGIN EXCLUSIVO ADMINISTRADOR -->
+  <div id="modal-login-admin" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-6 sm:p-7 shadow-elevated border border-slate-200 space-y-4">
+      <div class="text-center space-y-2">
+        <div class="w-14 h-14 rounded-2xl bg-indigo-50 border border-indigo-100 text-indigo-700 mx-auto flex items-center justify-center text-2xl shadow-sm">
+          <i class="fa-solid fa-lock"></i>
+        </div>
+        <h3 class="text-base font-bold text-slate-900">Acceso Administrador</h3>
+        <p class="text-xs text-slate-500">Ingresa con tus credenciales maestras de administración:</p>
+      </div>
+
+      <div id="login-admin-error" class="hidden p-3 bg-rose-50 border border-rose-200 text-rose-800 text-xs rounded-xl flex items-center space-x-2">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        <span id="login-admin-error-texto">Credenciales inválidas</span>
+      </div>
+
+      <form onsubmit="ejecutarLoginAdmin(event)" class="space-y-3">
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Usuario Administrador:</label>
+          <input type="text" id="admin-user-input" required placeholder="Ej. DamianSpears_Owner" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono font-medium focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Contraseña:</label>
+          <input type="password" id="admin-pass-input" required placeholder="••••••••••••" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono font-medium focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+        </div>
+
+        <div class="pt-2 flex space-x-2">
+          <button type="button" onclick="cerrarModalLoginAdmin()" class="flex-1 py-2.5 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition">
+            Cancelar
+          </button>
+          <button type="submit" id="btn-submit-login-admin" class="flex-1 py-2.5 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl shadow-md transition flex items-center justify-center space-x-1.5">
+            <i class="fa-solid fa-right-to-bracket"></i>
+            <span>Iniciar Sesión</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: CREAR / EDITAR USUARIO (ADMIN) -->
+  <div id="modal-usuario-form" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-xl w-full p-6 sm:p-7 shadow-elevated border border-slate-200 max-h-[90vh] overflow-y-auto space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <h3 id="modal-usuario-titulo" class="text-base font-bold text-slate-900 flex items-center space-x-2">
+          <i class="fa-solid fa-user-pen text-indigo-600"></i>
+          <span>Dar de Alta Nuevo Colaborador</span>
+        </h3>
+        <button onclick="cerrarModalUsuario()" class="text-slate-400 hover:text-slate-700 text-sm">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div id="form-usuario-error" class="hidden p-3 bg-rose-50 border border-rose-200 text-rose-800 text-xs rounded-xl flex items-center space-x-2">
+        <i class="fa-solid fa-circle-exclamation"></i>
+        <span id="form-usuario-error-texto">Error</span>
+      </div>
+
+      <form onsubmit="guardarUsuarioAdmin(event)" class="space-y-3.5 text-xs">
+        <input type="hidden" id="form-user-id">
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Nombre Completo *</label>
+            <input type="text" id="form-user-nombre" required placeholder="Ej. Roberto Gómez Bolaños" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+          </div>
+
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Correo Electrónico *</label>
+            <input type="email" id="form-user-email" required placeholder="nombre@grupomercantil.com.mx" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">RFC Mexicano (12-13 caracteres) *</label>
+            <input type="text" id="form-user-rfc" required placeholder="GOBR800101XYZ" maxlength="13" class="w-full p-2.5 font-mono uppercase bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+          </div>
+
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Clave Única de Acceso *</label>
+            <input type="text" id="form-user-clave" required placeholder="Ej. RGB-2026" class="w-full p-2.5 font-mono uppercase bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Puesto Corporativo</label>
+            <input type="text" id="form-user-puesto" placeholder="Ej. Coordinador de Compras" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+          </div>
+
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Departamento</label>
+            <input type="text" id="form-user-departamento" placeholder="Ej. Cadena de Suministro" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+          </div>
+        </div>
+
+        <div class="pt-2 border-t border-slate-100">
+          <span class="font-bold text-slate-800 block mb-2">Comisión de Viaje Asignada:</span>
+          
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">Destino</label>
+              <input type="text" id="form-user-destino" placeholder="Ej. Querétaro, Qro." class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+            </div>
+
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">Anticipo Otorgado ($ MXN)</label>
+              <input type="number" step="0.01" id="form-user-anticipo" placeholder="5000.00" class="w-full p-2.5 font-mono bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-2">
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">Fecha Inicio</label>
+              <input type="date" id="form-user-fecha-inicio" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-xl">
+            </div>
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">Fecha Fin</label>
+              <input type="date" id="form-user-fecha-fin" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-xl">
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">Estatus del Colaborador</label>
+          <select id="form-user-estatus" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl">
+            <option value="ACTIVO">ACTIVO (Permitir comprobar viáticos)</option>
+            <option value="INACTIVO">INACTIVO (Bloqueado)</option>
+          </select>
+        </div>
+
+        <div class="flex justify-end space-x-2 pt-3 border-t">
+          <button type="button" onclick="cerrarModalUsuario()" class="px-4 py-2.5 font-semibold text-slate-600 hover:bg-slate-100 rounded-xl">Cancelar</button>
+          <button type="submit" class="px-5 py-2.5 font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl shadow-md transition">Guardar Colaborador</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL DE CLAVE ÚNICA DE ACCESO A VIÁTICOS -->
+  <div id="modal-clave-empleado" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-slate-200 space-y-4">
+      <div class="text-center space-y-1.5">
+        <div id="modal-avatar-preview" class="w-14 h-14 rounded-2xl mx-auto flex items-center justify-center text-white font-bold text-lg shadow-md">
+          --
+        </div>
+        <h3 id="modal-empleado-nombre" class="text-base font-bold text-slate-900 pt-1">Colaborador</h3>
+        <p class="text-xs text-slate-500">Ingresa tu clave única de acceso para comprobar viáticos:</p>
+      </div>
+
+      <div id="modal-clave-error" class="hidden p-2.5 bg-rose-50 border border-rose-200 text-rose-800 text-xs rounded-xl flex items-center space-x-2">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        <span id="modal-clave-error-texto">Clave incorrecta</span>
+      </div>
+
+      <div class="space-y-2">
+        <label class="block text-xs font-semibold text-slate-700">Clave Única Alfanumérica:</label>
+        <div class="relative">
+          <input type="password" id="input-clave-unica" placeholder="Ej. JALM-2026" class="w-full text-center text-sm font-mono font-bold tracking-widest uppercase p-3 pr-10 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+          <button type="button" onclick="togglePasswordVisibility('input-clave-unica', this)" class="absolute right-3 top-3 text-slate-400 hover:text-slate-600 text-sm">
+            <i class="fa-solid fa-eye"></i>
+          </button>
+        </div>
+        <p class="text-[11px] text-slate-400 text-center">
+          <i class="fa-solid fa-shield-halved text-[10px] mr-1"></i> La clave es confidencial y personal de cada comisionado.
+        </p>
+      </div>
+
+      <div class="flex space-x-2 pt-2">
+        <button onclick="cerrarModalClave()" class="flex-1 py-2.5 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl">Cancelar</button>
+        <button onclick="confirmarIngresoEmpleado()" id="btn-confirmar-clave" class="flex-1 py-2.5 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl shadow-md transition flex items-center justify-center space-x-1.5">
+          <span>Ingresar</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL DE HOJA DE LIQUIDACIÓN FORMAL (IMPRIMIBLE) -->
+  <div id="modal-impresion" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl p-6 sm:p-8 space-y-6">
+      <div class="border-b-2 border-slate-900 pb-4 flex justify-between items-start">
+        <div>
+          <h2 class="text-base font-black uppercase tracking-wider text-slate-900">Grupo Mercantil Empresarial SA de CV</h2>
+          <p class="text-xs text-slate-500 font-mono">RFC: GME980512ABC | Régimen General Personas Morales</p>
+          <p class="text-xs font-bold text-emerald-800 mt-1 uppercase">Póliza y Hoja de Liquidación de Viáticos y Gastos de Viaje</p>
+        </div>
+        <div class="text-right">
+          <span class="block text-xs text-slate-500">Folio Liquidación:</span>
+          <span class="text-sm font-mono font-bold text-slate-900" id="print-folio">VIA-2026-0042</span>
+          <span class="block text-[10px] text-slate-400 mt-1" id="print-fecha-hoy"></span>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs bg-slate-50 p-4 rounded-2xl border">
+        <div><span class="text-slate-400 block text-[10px]">Comisionado:</span> <strong id="print-comisionado">--</strong></div>
+        <div><span class="text-slate-400 block text-[10px]">RFC Colaborador:</span> <strong id="print-rfc" class="font-mono">--</strong></div>
+        <div><span class="text-slate-400 block text-[10px]">Destino:</span> <strong id="print-destino">--</strong></div>
+        <div><span class="text-slate-400 block text-[10px]">Periodo:</span> <strong id="print-periodo" class="font-mono">--</strong></div>
+        <div><span class="text-slate-400 block text-[10px]">SAT Nómina:</span> <span class="font-mono text-emerald-700 font-bold">003 OtrosPagos</span></div>
+        <div><span class="text-slate-400 block text-[10px]">Dictamen:</span> <span class="font-bold text-emerald-700">AUDITADO Y VIGENTE</span></div>
+      </div>
+
+      <div class="space-y-2">
+        <h4 class="text-xs font-bold uppercase text-slate-700">Comprobantes Fiscales Validados (CFDI 4.0):</h4>
+        <table class="w-full text-[11px] border text-left">
+          <thead class="bg-slate-100 text-slate-700 border-b">
+            <tr>
+              <th class="p-2">UUID SAT / Proveedor</th>
+              <th class="p-2">Concepto</th>
+              <th class="p-2 text-right">Importe Factura</th>
+              <th class="p-2 text-right">Deducible LISR</th>
+              <th class="p-2 text-right">Excedente</th>
+            </tr>
+          </thead>
+          <tbody id="print-tabla-body" class="divide-y font-mono"></tbody>
+        </table>
+      </div>
+
+      <div class="bg-slate-100 p-4 rounded-2xl border flex flex-col sm:flex-row justify-between items-center text-xs gap-4">
+        <div class="space-y-1">
+          <div>Anticipo Otorgado: <strong class="font-mono" id="print-anticipo">$0.00 MXN</strong></div>
+          <div>Total Deducible Aprobado: <strong class="font-mono text-emerald-700" id="print-deducible">$0.00 MXN</strong></div>
+          <div>Excedentes / No Deducibles: <strong class="font-mono text-amber-700" id="print-excedente">$0.00 MXN</strong></div>
+        </div>
+        <div class="text-right sm:border-l sm:pl-6 border-slate-300">
+          <span class="text-xs uppercase font-bold text-slate-500 block" id="print-saldo-titulo">Saldo Neto a Reintegrar:</span>
+          <span class="text-2xl font-black font-mono text-slate-900 block" id="print-saldo-monto">$0.00 MXN</span>
+          <span class="text-[10px] text-slate-500 block" id="print-saldo-sub">Monto a depositar en cuenta concentradora</span>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-3 gap-6 text-center text-[10px] pt-4 border-t">
+        <div>
+          <div class="border-b border-slate-400 pb-7"></div>
+          <span class="font-bold block mt-1" id="print-firma-empleado">Comisionado</span>
+          <span class="text-slate-400">Firma del Colaborador</span>
+        </div>
+        <div>
+          <div class="border-b border-slate-400 pb-7"></div>
+          <span class="font-bold block mt-1">Jefe Inmediato</span>
+          <span class="text-slate-400">Autorización Técnica</span>
+        </div>
+        <div>
+          <div class="border-b border-slate-400 pb-7"></div>
+          <span class="font-bold block mt-1">Auditoría / Finanzas</span>
+          <span class="text-slate-400">Revisión Fiscal SAT</span>
+        </div>
+      </div>
+
+      <div class="flex justify-end space-x-3 pt-3 border-t">
+        <button onclick="cerrarModalImpresion()" class="px-4 py-2 text-xs font-semibold text-slate-600 hover:text-slate-800">Cerrar</button>
+        <button onclick="window.print()" class="bg-emerald-700 hover:bg-emerald-800 text-white px-5 py-2 rounded-xl text-xs font-bold flex items-center space-x-2 shadow">
+          <i class="fa-solid fa-print"></i>
+          <span>Imprimir / Guardar en PDF</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ========================================================================= -->
+  <!-- SCRIPT CLIENTE Y MANEJO DE ESTADOS                                       -->
+  <!-- ========================================================================= -->
+  <script>
+    let empleadoActualId = 'emp-julian';
+    let empleadoPendienteId = null;
+    let catalogoEmpleados = [];
+    let liquidacionData = null;
+    let adminToken = localStorage.getItem('viaticos_admin_token') || null;
+    let listaUsuariosAdmin = [];
+    let sesionDesbloqueada = false; // Solo se desbloquean los montos al validar la clave única
+    let montosVisibles = true; // Toggle para ocultar/mostrar con asteriscos los montos propios
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      document.getElementById('print-fecha-hoy').textContent = 'Fecha Emisión: ' + new Date().toLocaleDateString('es-MX');
+      await verificarSesionAdmin();
+      await cargarListaEmpleados();
+      // Inicialmente bloqueado hasta ingresar clave, o desbloqueado si ya autenticó
+      await cargarViajeEmpleado(empleadoActualId);
+
+      // Sincronización en vivo con la App Móvil: recarga periódica silenciosa cada 3 segundos
+      setInterval(async () => {
+        if (!document.hidden && empleadoActualId) {
+          try {
+            const res = await fetch(`/api/empleados/${empleadoActualId}/viaje`);
+            const json = await res.json();
+            if (json.success) {
+              liquidacionData = json.data;
+              renderizarTodo(json.data);
+            }
+            const resEmp = await fetch('/api/empleados');
+            const jsonEmp = await resEmp.json();
+            if (jsonEmp.success) {
+              catalogoEmpleados = jsonEmp.empleados;
+              renderizarSelectorEmpleados(catalogoEmpleados);
+            }
+          } catch (e) {
+            // Silencioso en caso de pérdida temporal de conexión
+          }
+        }
+      }, 3000);
+    });
+
+    function toggleVisibilidadMontos() {
+      montosVisibles = !montosVisibles;
+      if (liquidacionData) renderizarTodo(liquidacionData);
+      renderizarSelectorEmpleados(catalogoEmpleados);
+    }
+
+    function bloquearSesionColaborador() {
+      sesionDesbloqueada = false;
+      if (liquidacionData) renderizarTodo(liquidacionData);
+      renderizarSelectorEmpleados(catalogoEmpleados);
+    }
+
+    // Control de Pestañas
+    function cambiarPestana(tab) {
+      const vViaticos = document.getElementById('vista-viaticos');
+      const vAdmin = document.getElementById('vista-admin');
+      const btnViaticos = document.getElementById('tab-btn-viaticos');
+      const btnAdmin = document.getElementById('tab-btn-admin');
+
+      if (tab === 'viaticos') {
+        vViaticos.classList.remove('hidden');
+        vAdmin.classList.add('hidden');
+        btnViaticos.className = "px-4 py-1.5 rounded-xl text-xs font-bold transition-all bg-white text-slate-900 shadow-sm";
+        btnAdmin.className = "px-4 py-1.5 rounded-xl text-xs font-bold transition-all text-slate-600 hover:text-slate-900";
+      } else if (tab === 'admin') {
+        if (!adminToken) {
+          abrirModalLoginAdmin();
+          return;
+        }
+        vViaticos.classList.add('hidden');
+        vAdmin.classList.remove('hidden');
+        btnAdmin.className = "px-4 py-1.5 rounded-xl text-xs font-bold transition-all bg-white text-slate-900 shadow-sm";
+        btnViaticos.className = "px-4 py-1.5 rounded-xl text-xs font-bold transition-all text-slate-600 hover:text-slate-900";
+        if (!colaboradorInspeccionadoId) {
+          document.getElementById('admin-subvista-usuarios').classList.remove('hidden');
+          document.getElementById('admin-subvista-movimientos').classList.add('hidden');
+        }
+        cargarUsuariosAdmin();
+      }
+    }
+
+    // ==========================================
+    // AUTENTICACIÓN ADMIN Y SEGURIDAD
+    // ==========================================
+    async function verificarSesionAdmin() {
+      if (!adminToken) {
+        setAdminUI(false);
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/admin/verificar-sesion', {
+          headers: { 'Authorization': `Bearer ${adminToken}` }
+        });
+        const json = await res.json();
+        if (json.success) {
+          setAdminUI(true, json.admin.username);
+        } else {
+          cerrarSesionAdmin(false);
+        }
+      } catch (err) {
+        cerrarSesionAdmin(false);
+      }
+    }
+
+    function setAdminUI(esAdmin, username = 'DamianSpears_Owner') {
+      const tabAdmin = document.getElementById('tab-btn-admin');
+      const triggerLogin = document.getElementById('contenedor-login-trigger');
+      const badgeAdmin = document.getElementById('contenedor-admin-badge');
+      const labelUser = document.getElementById('label-admin-username');
+
+      if (esAdmin) {
+        tabAdmin.classList.remove('hidden');
+        triggerLogin.classList.add('hidden');
+        badgeAdmin.classList.remove('hidden');
+        labelUser.textContent = username;
+      } else {
+        tabAdmin.classList.add('hidden');
+        triggerLogin.classList.remove('hidden');
+        badgeAdmin.classList.add('hidden');
+        if (!document.getElementById('vista-admin').classList.contains('hidden')) {
+          cambiarPestana('viaticos');
+        }
+      }
+    }
+
+    function abrirModalLoginAdmin() {
+      document.getElementById('login-admin-error').classList.add('hidden');
+      document.getElementById('admin-user-input').value = 'DamianSpears_Owner';
+      document.getElementById('admin-pass-input').value = '';
+      document.getElementById('modal-login-admin').classList.remove('hidden');
+      setTimeout(() => document.getElementById('admin-pass-input').focus(), 100);
+    }
+
+    function cerrarModalLoginAdmin() {
+      document.getElementById('modal-login-admin').classList.add('hidden');
+    }
+
+    async function ejecutarLoginAdmin(e) {
+      e.preventDefault();
+      const username = document.getElementById('admin-user-input').value.trim();
+      const password = document.getElementById('admin-pass-input').value;
+      const errorDiv = document.getElementById('login-admin-error');
+      const errorTxt = document.getElementById('login-admin-error-texto');
+      const btn = document.getElementById('btn-submit-login-admin');
+
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> Verificando...';
+
+      try {
+        const res = await fetch('/api/admin/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+        const json = await res.json();
+
+        if (json.success) {
+          adminToken = json.token;
+          localStorage.setItem('viaticos_admin_token', adminToken);
+          cerrarModalLoginAdmin();
+          setAdminUI(true, json.admin.username);
+          cambiarPestana('admin');
+        } else {
+          errorDiv.classList.remove('hidden');
+          errorTxt.textContent = json.mensaje || 'Credenciales inválidas';
+        }
+      } catch (err) {
+        errorDiv.classList.remove('hidden');
+        errorTxt.textContent = 'Error de conexión con el servidor.';
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-right-to-bracket mr-1"></i> Iniciar Sesión';
+      }
+    }
+
+    async function cerrarSesionAdmin(notificarServidor = true) {
+      if (notificarServidor && adminToken) {
+        fetch('/api/admin/logout', {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${adminToken}` }
+        }).catch(() => {});
+      }
+      adminToken = null;
+      colaboradorInspeccionadoId = null;
+      localStorage.removeItem('viaticos_admin_token');
+      setAdminUI(false);
+      cambiarPestana('viaticos');
+    }
+
+    // ==========================================
+    // GESTIÓN DE USUARIOS (ADMIN)
+    // ==========================================
+    async function cargarUsuariosAdmin() {
+      if (!adminToken) return;
+
+      try {
+        const res = await fetch('/api/admin/usuarios', {
+          headers: { 'Authorization': `Bearer ${adminToken}` }
+        });
+        const json = await res.json();
+
+        if (json.success) {
+          listaUsuariosAdmin = json.usuarios;
+          renderizarTablaUsuariosAdmin(listaUsuariosAdmin);
+          actualizarMetricasAdmin(listaUsuariosAdmin);
+        }
+      } catch (err) {
+        console.error('Error cargando usuarios admin:', err);
+      }
+    }
+
+    function actualizarMetricasAdmin(usuarios) {
+      const total = usuarios.length;
+      const activos = usuarios.filter(u => u.estatus === 'ACTIVO').length;
+      const totalAnticipos = usuarios.reduce((sum, u) => sum + (u.viaje ? u.viaje.anticipoOtorgado : 0), 0);
+
+      document.getElementById('admin-metric-total').textContent = total;
+      document.getElementById('admin-metric-activos').textContent = activos;
+      document.getElementById('admin-metric-anticipos').textContent = '$' + totalAnticipos.toLocaleString('es-MX', { minimumFractionDigits: 2 });
+    }
+
+    function renderizarTablaUsuariosAdmin(usuarios) {
+      const tbody = document.getElementById('tabla-admin-usuarios-body');
+      if (usuarios.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="py-8 text-center text-slate-400">No se encontraron colaboradores.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = usuarios.map(u => `
+        <tr class="hover:bg-slate-50 transition">
+          <td class="py-3 px-4">
+            <strong class="text-slate-800 block">${u.nombre}</strong>
+            <span class="text-[11px] text-slate-400 font-mono">ID: ${u.id}</span>
+          </td>
+          <td class="py-3 px-4">
+            <span class="font-mono font-bold text-slate-700 block">${u.rfc}</span>
+            <span class="text-[11px] text-slate-500">${u.email}</span>
+          </td>
+          <td class="py-3 px-4">
+            <span class="text-slate-800 font-semibold block">${u.puesto}</span>
+            <span class="text-[11px] text-slate-400">${u.departamento}</span>
+          </td>
+          <td class="py-3 px-4">
+            <span class="font-mono font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+              ${u.claveAcceso}
+            </span>
+          </td>
+          <td class="py-3 px-4">
+            <span class="font-bold text-slate-800 block">${u.viaje ? u.viaje.destino : 'Sin viaje'}</span>
+            <span class="font-mono text-blue-700 font-bold">$${(u.viaje ? u.viaje.anticipoOtorgado : 0).toLocaleString('es-MX', { minimumFractionDigits: 2 })}</span>
+          </td>
+          <td class="py-3 px-4 text-center">
+            <span class="${u.estatus === 'ACTIVO' ? 'bg-emerald-100 text-emerald-800 border-emerald-200' : 'bg-slate-100 text-slate-500 border-slate-200'} text-[10px] font-bold px-2 py-0.5 rounded-full border">
+              ${u.estatus}
+            </span>
+          </td>
+          <td class="py-3 px-4 text-right">
+            <div class="flex items-center justify-end space-x-1.5">
+              <button onclick="inspeccionarMovimientosAdmin('${u.id}')" title="Revisar movimientos y facturas" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-3 py-1.5 rounded-xl shadow-sm text-xs transition flex items-center space-x-1">
+                <i class="fa-solid fa-magnifying-glass-dollar"></i>
+                <span class="hidden sm:inline">Movimientos</span>
+              </button>
+              <button onclick="editarUsuarioClick('${u.id}')" title="Editar datos del colaborador" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-2.5 py-1.5 rounded-xl border border-slate-200 text-xs transition">
+                <i class="fa-solid fa-pen-to-square"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    let colaboradorInspeccionadoId = null;
+
+    function volverAUsuariosAdmin() {
+      document.getElementById('admin-subvista-movimientos').classList.add('hidden');
+      document.getElementById('admin-subvista-usuarios').classList.remove('hidden');
+      colaboradorInspeccionadoId = null;
+      cargarUsuariosAdmin();
+    }
+
+    async function inspeccionarMovimientosAdmin(empId) {
+      colaboradorInspeccionadoId = empId;
+      document.getElementById('admin-subvista-usuarios').classList.add('hidden');
+      document.getElementById('admin-subvista-movimientos').classList.remove('hidden');
+
+      // Buscar datos en listas cargadas
+      const u = listaUsuariosAdmin.find(x => x.id === empId) || catalogoEmpleados.find(x => x.id === empId);
+      if (u) {
+        document.getElementById('admin-colab-nombre').textContent = u.nombre;
+        document.getElementById('admin-colab-subtitulo').textContent = `${u.puesto || ''} • ${u.departamento || ''}`;
+        document.getElementById('admin-colab-rfc').textContent = `RFC: ${u.rfc || '--'}`;
+        document.getElementById('admin-colab-destino').innerHTML = `<i class="fa-solid fa-plane-departure text-slate-400 mr-1"></i> Destino: ${u.viaje ? u.viaje.destino : (u.destino || '--')}`;
+        document.getElementById('admin-colab-folio').textContent = `Folio: ${u.viaje ? u.viaje.folio : 'VIA-2026-ACT'}`;
+        document.getElementById('admin-colab-clave').textContent = u.claveAcceso || '--';
+        document.getElementById('admin-colab-estatus-badge').textContent = u.estatus || 'ACTIVO';
+
+        const partes = (u.nombre || '').trim().split(' ');
+        const iniciales = partes.length >= 2 ? (partes[0][0] + partes[1][0]).toUpperCase() : (partes[0] ? partes[0].slice(0, 2).toUpperCase() : 'US');
+        document.getElementById('admin-colab-avatar').textContent = iniciales;
+      }
+
+      await cargarMovimientosColaboradorAdmin(empId);
+    }
+
+    async function cargarMovimientosColaboradorAdmin(empId) {
+      const tbody = document.getElementById('tabla-admin-movimientos-body');
+      const badgeCount = document.getElementById('admin-colab-badge-count');
+      tbody.innerHTML = `<tr><td colspan="7" class="py-8 text-center text-slate-400"><i class="fa-solid fa-circle-notch fa-spin text-indigo-600 mr-2"></i> Cargando movimientos fiscales...</td></tr>`;
+
+      try {
+        const res = await fetch(`/api/empleados/${empId}/viaje`);
+        const json = await res.json();
+
+        if (json.success && json.data) {
+          const liq = json.data;
+          const viaje = liq.empleado.viaje;
+          const anticipo = viaje ? viaje.anticipoOtorgado : 0;
+          const totalGastado = liq.totalDeducible + liq.totalExcedenteNoDeducible;
+
+          // Métricas
+          document.getElementById('admin-colab-anticipo').textContent = '$' + anticipo.toLocaleString('es-MX', { minimumFractionDigits: 2 });
+          document.getElementById('admin-colab-gastado').textContent = '$' + totalGastado.toLocaleString('es-MX', { minimumFractionDigits: 2 });
+          document.getElementById('admin-colab-deducible').textContent = '$' + liq.totalDeducible.toLocaleString('es-MX', { minimumFractionDigits: 2 });
+
+          const cardSaldo = document.getElementById('admin-colab-card-saldo');
+          const lblSaldo = document.getElementById('admin-colab-label-saldo');
+          const valSaldo = document.getElementById('admin-colab-valor-saldo');
+          const descSaldo = document.getElementById('admin-colab-desc-saldo');
+
+          if (liq.saldoAFavorEmpresa >= 0) {
+            cardSaldo.className = 'bg-emerald-50/60 rounded-2xl p-4 border border-emerald-100';
+            lblSaldo.className = 'text-[10px] font-bold text-emerald-800 uppercase block tracking-wider';
+            lblSaldo.textContent = 'Saldo por Reintegrar';
+            valSaldo.className = 'text-xl font-black text-emerald-900 font-mono mt-1 block';
+            valSaldo.textContent = '$' + liq.saldoAFavorEmpresa.toLocaleString('es-MX', { minimumFractionDigits: 2 });
+            descSaldo.className = 'text-[10px] text-emerald-700 mt-0.5 block';
+            descSaldo.textContent = 'A favor de la empresa';
+          } else {
+            const excedente = Math.abs(liq.saldoAFavorEmpresa);
+            cardSaldo.className = 'bg-rose-50/60 rounded-2xl p-4 border border-rose-100';
+            lblSaldo.className = 'text-[10px] font-bold text-rose-800 uppercase block tracking-wider';
+            lblSaldo.textContent = 'Excedente a Reembolsar';
+            valSaldo.className = 'text-xl font-black text-rose-900 font-mono mt-1 block';
+            valSaldo.textContent = '$' + excedente.toLocaleString('es-MX', { minimumFractionDigits: 2 });
+            descSaldo.className = 'text-[10px] text-rose-700 mt-0.5 block';
+            descSaldo.textContent = 'A favor del colaborador';
+          }
+
+          // Lista de comprobantes
+          badgeCount.textContent = `${liq.comprobantes.length} facturas`;
+
+          if (liq.comprobantes.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="7" class="py-8 text-center text-slate-400">Este colaborador aún no ha subido comprobantes XML.</td></tr>`;
+          } else {
+            tbody.innerHTML = liq.comprobantes.map(c => {
+              const esRechazado = (c.estatus === 'RECHAZADO');
+              const badgeEstatus = esRechazado
+                ? `<span class="bg-rose-100 text-rose-800 text-[10px] font-bold px-2.5 py-0.5 rounded-full border border-rose-200 font-sans"><i class="fa-solid fa-xmark mr-1"></i>RECHAZADA</span>`
+                : `<span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2.5 py-0.5 rounded-full border border-emerald-200 font-sans"><i class="fa-solid fa-check mr-1"></i>APROBADA</span>`;
+
+              const botonAccion = esRechazado
+                ? `<button onclick="cambiarEstatusFacturaAdmin('${empId}', '${c.uuid}', 'APROBADO')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-3 py-1.5 rounded-xl shadow-sm text-xs transition flex items-center space-x-1 ml-auto"><i class="fa-solid fa-check"></i><span>Aceptar</span></button>`
+                : `<button onclick="confirmarRechazarFacturaAdmin('${empId}', '${c.uuid}', '${c.nombreEmisor.replace(/'/g, "\\'")}', ${c.total})" class="bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold px-3 py-1.5 rounded-xl text-xs transition flex items-center space-x-1 ml-auto"><i class="fa-solid fa-xmark"></i><span>Rechazar</span></button>`;
+
+              return `
+                <tr class="hover:bg-slate-50 transition">
+                  <td class="py-3 px-4">
+                    <strong class="text-slate-800 block text-xs">${c.nombreEmisor}</strong>
+                    <span class="text-[10px] text-slate-400 font-mono">${c.uuid}</span>
+                  </td>
+                  <td class="py-3 px-4">
+                    <span class="bg-slate-100 text-slate-700 px-2.5 py-0.5 rounded-full text-[10px] font-bold font-sans">${c.categoria}</span>
+                  </td>
+                  <td class="py-3 px-4 text-slate-600 font-mono text-[11px]">${c.fechaEmision.replace('T', ' ')}</td>
+                  <td class="py-3 px-4 text-right font-mono font-bold text-slate-900 text-xs">$${c.total.toFixed(2)}</td>
+                  <td class="py-3 px-4 text-right font-mono font-bold ${esRechazado ? 'text-slate-400 line-through' : 'text-emerald-700'} text-xs">$${c.deducible.toFixed(2)}</td>
+                  <td class="py-3 px-4 text-center">${badgeEstatus}</td>
+                  <td class="py-3 px-4 text-right">${botonAccion}</td>
+                </tr>
+              `;
+            }).join('');
+          }
+        }
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="7" class="py-8 text-center text-rose-500">Error al cargar movimientos del colaborador.</td></tr>`;
+      }
+    }
+
+    function confirmarRechazarFacturaAdmin(empId, uuid, emisor, total) {
+      if (confirm(`¿Estás seguro de RECHAZAR la factura de "${emisor}" por $${total.toFixed(2)} MXN?\n\nAl rechazarla, el monto deducible se recalculará a $0.00 y aumentará el saldo a favor de la empresa.`)) {
+        cambiarEstatusFacturaAdmin(empId, uuid, 'RECHAZADO');
+      }
+    }
+
+    async function cambiarEstatusFacturaAdmin(empId, uuid, nuevoEstatus, motivo = '') {
+      if (!adminToken) {
+        alert('Debes tener una sesión de administrador activa.');
+        return;
+      }
+
+      try {
+        const res = await fetch(`/api/admin/empleados/${empId}/comprobantes/${uuid}/estatus`, {
+          method: 'PUT',
+          headers: {
+            'Authorization': `Bearer ${adminToken}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ estatus: nuevoEstatus, motivo })
+        });
+
+        const json = await res.json();
+        if (json.success) {
+          // Recargar movimientos del colaborador
+          await cargarMovimientosColaboradorAdmin(empId);
+          // Si estamos viendo la liquidación de este empleado en la pestaña de viáticos, actualizarla también
+          if (empleadoActualId === empId) {
+            await cargarViajeEmpleado(empId);
+          }
+          await cargarUsuariosAdmin();
+        } else {
+          alert('Error al actualizar factura: ' + (json.mensaje || 'Error del servidor'));
+        }
+      } catch (err) {
+        alert('Error de conexión al cambiar estatus de factura.');
+      }
+    }
+
+    function filtrarUsuariosAdmin(termino) {
+      const q = termino.trim().toLowerCase();
+      const filtrados = listaUsuariosAdmin.filter(u => 
+        u.nombre.toLowerCase().includes(q) ||
+        u.rfc.toLowerCase().includes(q) ||
+        u.email.toLowerCase().includes(q) ||
+        (u.viaje && u.viaje.destino.toLowerCase().includes(q))
+      );
+      renderizarTablaUsuariosAdmin(filtrados);
+    }
+
+    function abrirModalUsuario(esEdicion = false, usuario = null) {
+      document.getElementById('form-usuario-error').classList.add('hidden');
+      const titulo = document.getElementById('modal-usuario-titulo');
+      
+      if (esEdicion && usuario) {
+        titulo.innerHTML = `<i class="fa-solid fa-user-pen text-indigo-600 mr-2"></i> Editar Colaborador: ${usuario.nombre}`;
+        document.getElementById('form-user-id').value = usuario.id;
+        document.getElementById('form-user-nombre').value = usuario.nombre;
+        document.getElementById('form-user-email').value = usuario.email || '';
+        document.getElementById('form-user-rfc').value = usuario.rfc;
+        document.getElementById('form-user-clave').value = usuario.claveAcceso;
+        document.getElementById('form-user-puesto').value = usuario.puesto;
+        document.getElementById('form-user-departamento').value = usuario.departamento;
+        document.getElementById('form-user-estatus').value = usuario.estatus;
+
+        if (usuario.viaje) {
+          document.getElementById('form-user-destino').value = usuario.viaje.destino || '';
+          document.getElementById('form-user-anticipo').value = usuario.viaje.anticipoOtorgado || '';
+          document.getElementById('form-user-fecha-inicio').value = usuario.viaje.fechaInicio || '';
+          document.getElementById('form-user-fecha-fin').value = usuario.viaje.fechaFin || '';
+        }
+      } else {
+        titulo.innerHTML = `<i class="fa-solid fa-user-plus text-emerald-600 mr-2"></i> Dar de Alta Nuevo Colaborador`;
+        document.getElementById('form-user-id').value = '';
+        document.getElementById('form-user-nombre').value = '';
+        document.getElementById('form-user-email').value = '';
+        document.getElementById('form-user-rfc').value = '';
+        document.getElementById('form-user-clave').value = 'EMP-' + Math.floor(1000 + Math.random() * 9000);
+        document.getElementById('form-user-puesto').value = 'Especialista';
+        document.getElementById('form-user-departamento').value = 'Operaciones';
+        document.getElementById('form-user-destino').value = 'Ciudad de México, CDMX';
+        document.getElementById('form-user-anticipo').value = '5000.00';
+        document.getElementById('form-user-fecha-inicio').value = '2026-10-20';
+        document.getElementById('form-user-fecha-fin').value = '2026-10-24';
+        document.getElementById('form-user-estatus').value = 'ACTIVO';
+      }
+
+      document.getElementById('modal-usuario-form').classList.remove('hidden');
+    }
+
+    function cerrarModalUsuario() {
+      document.getElementById('modal-usuario-form').classList.add('hidden');
+    }
+
+    function editarUsuarioClick(id) {
+      const u = listaUsuariosAdmin.find(user => user.id === id);
+      if (u) abrirModalUsuario(true, u);
+    }
+
+    async function guardarUsuarioAdmin(e) {
+      e.preventDefault();
+      const id = document.getElementById('form-user-id').value;
+      const errorDiv = document.getElementById('form-usuario-error');
+      const errorTxt = document.getElementById('form-usuario-error-texto');
+
+      const payload = {
+        nombre: document.getElementById('form-user-nombre').value.trim(),
+        email: document.getElementById('form-user-email').value.trim(),
+        rfc: document.getElementById('form-user-rfc').value.trim(),
+        claveAcceso: document.getElementById('form-user-clave').value.trim(),
+        puesto: document.getElementById('form-user-puesto').value.trim(),
+        departamento: document.getElementById('form-user-departamento').value.trim(),
+        estatus: document.getElementById('form-user-estatus').value,
+        viaje: {
+          destino: document.getElementById('form-user-destino').value.trim(),
+          anticipoOtorgado: parseFloat(document.getElementById('form-user-anticipo').value) || 0,
+          fechaInicio: document.getElementById('form-user-fecha-inicio').value,
+          fechaFin: document.getElementById('form-user-fecha-fin').value
+        }
+      };
+
+      const url = id ? `/api/admin/usuarios/${id}` : '/api/admin/usuarios';
+      const method = id ? 'PUT' : 'POST';
+
+      try {
+        const res = await fetch(url, {
+          method,
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${adminToken}`
+          },
+          body: JSON.stringify(payload)
+        });
+        const json = await res.json();
+
+        if (json.success) {
+          cerrarModalUsuario();
+          await cargarUsuariosAdmin();
+          await cargarListaEmpleados(); // Actualiza selector público
+        } else {
+          errorDiv.classList.remove('hidden');
+          errorTxt.textContent = json.mensaje || 'Error al guardar colaborador';
+        }
+      } catch (err) {
+        errorDiv.classList.remove('hidden');
+        errorTxt.textContent = 'Error de comunicación con el servidor.';
+      }
+    }
+
+
+    // ==========================================
+    // SELECTOR DE COLABORADORES Y VIÁTICOS
+    // ==========================================
+    async function cargarListaEmpleados() {
+      try {
+        const res = await fetch('/api/empleados');
+        const json = await res.json();
+        if (json.success) {
+          catalogoEmpleados = json.empleados;
+          renderizarSelectorEmpleados(catalogoEmpleados);
+        }
+      } catch (err) {
+        console.error('Error cargando empleados:', err);
+      }
+    }
+
+    function renderizarSelectorEmpleados(empleados) {
+      const contenedor = document.getElementById('grid-empleados-selector');
+      contenedor.innerHTML = empleados.map(emp => {
+        const esActivo = (emp.id === empleadoActualId);
+        const estaDesbloqueado = (esActivo && sesionDesbloqueada);
+
+        // El monto pendiente/anticipo solo es visible si esta sesión específica está desbloqueada
+        let textoMonto = '$ •••••• MXN';
+        if (estaDesbloqueado && liquidacionData && liquidacionData.empleado && liquidacionData.empleado.id === emp.id) {
+          if (montosVisibles) {
+            const anticipoVal = liquidacionData.empleado.viaje ? liquidacionData.empleado.viaje.anticipoOtorgado : 0;
+            textoMonto = '$' + anticipoVal.toLocaleString('es-MX', { minimumFractionDigits: 2 }) + ' MXN';
+          } else {
+            textoMonto = '$ •••••• MXN';
+          }
+        }
+
+        return `
+          <div id="card-${emp.id}" onclick="seleccionarEmpleadoRapido('${emp.id}')" class="cursor-pointer group relative bg-white hover:bg-slate-50/60 rounded-2xl p-4.5 border-2 ${esActivo ? 'border-emerald-600 shadow-elevated' : 'border-transparent hover:border-slate-300 shadow-soft-card'} transition-all duration-300">
+            <div class="flex items-start justify-between">
+              <div class="flex items-center space-x-3">
+                <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr ${emp.avatarGradient || 'from-emerald-600 to-teal-800'} text-white font-bold text-sm flex items-center justify-center shadow-md group-hover:scale-105 transition-transform">
+                  ${emp.iniciales || 'EM'}
+                </div>
+                <div>
+                  <h3 class="text-sm font-bold text-slate-900 leading-tight">${emp.nombre}</h3>
+                  <span class="text-[11px] text-slate-500 block">${emp.puesto}</span>
+                </div>
+              </div>
+              <span id="badge-activo-${emp.id}" class="${esActivo ? '' : 'hidden'} ${estaDesbloqueado ? 'bg-emerald-600' : 'bg-slate-600'} text-white text-[10px] font-bold px-2 py-0.5 rounded-full tracking-wider uppercase shadow-sm">
+                ${estaDesbloqueado ? 'Sesión Activa' : 'Bloqueado'}
+              </span>
+            </div>
+
+            <div class="mt-4 pt-3 border-t border-slate-100 space-y-1.5 text-xs">
+              <div class="flex items-center justify-between text-slate-600">
+                <span><i class="fa-solid fa-plane-departure text-slate-400 mr-1.5"></i> Destino:</span>
+                <strong class="text-slate-800">${emp.destino}</strong>
+              </div>
+              <div class="flex items-center justify-between text-slate-600">
+                <span><i class="fa-solid fa-wallet text-slate-400 mr-1.5"></i> Anticipo / Pendiente:</span>
+                <span class="font-mono font-bold ${estaDesbloqueado && montosVisibles ? 'text-slate-800' : 'text-slate-400 bg-slate-100 px-2 py-0.5 rounded tracking-widest text-[11px]'} select-none">
+                  ${textoMonto}
+                </span>
+              </div>
+            </div>
+
+            <div class="mt-3.5 bg-slate-50 group-hover:bg-white rounded-xl p-2 border border-slate-200/80 flex items-center justify-between text-[11px]">
+              <span class="text-slate-400 font-medium flex items-center">
+                <i class="fa-solid fa-lock text-[10px] mr-1.5 text-slate-400"></i> Clave de acceso:
+              </span>
+              <span class="font-mono font-bold text-slate-400 bg-slate-100 px-2.5 py-0.5 rounded tracking-widest text-[11px] select-none">
+                ••••••••
+              </span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function togglePasswordVisibility(inputId, btn) {
+      const input = document.getElementById(inputId);
+      const icon = btn.querySelector('i');
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.className = 'fa-solid fa-eye-slash';
+      } else {
+        input.type = 'password';
+        icon.className = 'fa-solid fa-eye';
+      }
+    }
+
+    function seleccionarEmpleadoRapido(empId) {
+      empleadoPendienteId = empId;
+      const emp = catalogoEmpleados.find(e => e.id === empId);
+      if (!emp) return;
+
+      document.getElementById('modal-empleado-nombre').textContent = emp.nombre;
+      document.getElementById('modal-clave-error').classList.add('hidden');
+      document.getElementById('input-clave-unica').value = '';
+      document.getElementById('input-clave-unica').type = 'password';
+      
+      const avatar = document.getElementById('modal-avatar-preview');
+      avatar.className = `w-14 h-14 rounded-2xl mx-auto flex items-center justify-center text-white font-bold text-lg shadow-md bg-gradient-to-tr ${emp.avatarGradient || 'from-emerald-600 to-teal-800'}`;
+      avatar.textContent = emp.iniciales || 'EM';
+
+      document.getElementById('modal-clave-empleado').classList.remove('hidden');
+      setTimeout(() => document.getElementById('input-clave-unica').focus(), 100);
+    }
+
+    function cerrarModalClave() {
+      document.getElementById('modal-clave-empleado').classList.add('hidden');
+    }
+
+    async function confirmarIngresoEmpleado() {
+      const errorDiv = document.getElementById('modal-clave-error');
+      const errorTxt = document.getElementById('modal-clave-error-texto');
+      const btn = document.getElementById('btn-confirmar-clave');
+      const claveIngresada = document.getElementById('input-clave-unica').value.trim();
+
+      if (!claveIngresada) {
+        errorDiv.classList.remove('hidden');
+        errorTxt.textContent = 'Por favor ingresa tu clave única.';
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> Validando...';
+
+      try {
+        const res = await fetch(`/api/empleados/${empleadoPendienteId}/verificar-clave`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ clave: claveIngresada })
+        });
+        const json = await res.json();
+
+        if (json.success) {
+          empleadoActualId = empleadoPendienteId;
+          sesionDesbloqueada = true;
+          montosVisibles = true;
+          cerrarModalClave();
+          renderizarSelectorEmpleados(catalogoEmpleados);
+          await cargarViajeEmpleado(empleadoActualId);
+        } else {
+          errorDiv.classList.remove('hidden');
+          errorTxt.textContent = json.mensaje || 'Clave única incorrecta.';
+          document.getElementById('input-clave-unica').select();
+        }
+      } catch (err) {
+        errorDiv.classList.remove('hidden');
+        errorTxt.textContent = 'Error al verificar clave con el servidor.';
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<span>Ingresar</span>';
+      }
+    }
+
+    async function cargarViajeEmpleado(empId) {
+      try {
+        const res = await fetch(`/api/empleados/${empId}/viaje`);
+        const json = await res.json();
+        if (json.success) {
+          liquidacionData = json.data;
+          renderizarTodo(json.data);
+        }
+      } catch (err) {
+        console.error('Error cargando viaje:', err);
+      }
+    }
+
+    function renderizarTodo(data) {
+      const emp = data.empleado;
+      const viaje = emp.viaje || { folio: 'VIA-SIN-ASIGNAR', motivo: 'Sin comisión', destino: 'N/A', fechaInicio: '--', fechaFin: '--', anticipoOtorgado: 0 };
+
+      document.getElementById('label-tabla-empleado').textContent = emp.nombre;
+      document.getElementById('label-folio-viaje').textContent = viaje.folio;
+      document.getElementById('label-motivo-viaje').textContent = viaje.motivo;
+      document.getElementById('label-destino-viaje').textContent = viaje.destino;
+      document.getElementById('label-rfc-colaborador').textContent = emp.rfc;
+      document.getElementById('label-fechas-viaje').textContent = `${viaje.fechaInicio} al ${viaje.fechaFin}`;
+
+      // Métricas Financieras: si la sesión no está desbloqueada o están ocultos, se muestran con asteriscos
+      const debeMostrarMontos = (sesionDesbloqueada && montosVisibles);
+      const btnToggleIcon = document.getElementById('btn-toggle-montos-icon');
+      const btnToggleTexto = document.getElementById('btn-toggle-montos-texto');
+
+      if (btnToggleIcon && btnToggleTexto) {
+        btnToggleIcon.className = debeMostrarMontos ? 'fa-solid fa-eye-slash text-slate-400' : 'fa-solid fa-eye text-emerald-600';
+        btnToggleTexto.textContent = debeMostrarMontos ? 'Ocultar montos' : 'Mostrar montos';
+      }
+
+      if (debeMostrarMontos) {
+        document.getElementById('metric-anticipo').textContent = '$' + (viaje.anticipoOtorgado || 0).toLocaleString('es-MX', { minimumFractionDigits: 2 });
+        document.getElementById('metric-deducible').textContent = '$' + (data.totalDeducible || 0).toLocaleString('es-MX', { minimumFractionDigits: 2 });
+        document.getElementById('metric-excedente').textContent = '$' + (data.totalExcedenteNoDeducible || 0).toLocaleString('es-MX', { minimumFractionDigits: 2 });
+      } else {
+        document.getElementById('metric-anticipo').textContent = '$ ••••••';
+        document.getElementById('metric-deducible').textContent = '$ ••••••';
+        document.getElementById('metric-excedente').textContent = '$ ••••••';
+      }
+
+      const saldoContainer = document.getElementById('metric-saldo-container');
+      const saldoLabel = document.getElementById('metric-saldo-label');
+      const saldoMonto = document.getElementById('metric-saldo');
+      const saldoDesc = document.getElementById('metric-saldo-desc');
+
+      if (debeMostrarMontos) {
+        if (data.saldoAFavorEmpresa > 0) {
+          saldoContainer.className = 'bg-gradient-to-b from-amber-50 to-white rounded-3xl p-5 border border-amber-300 shadow-soft-card hover:shadow-elevated transition-all flex flex-col justify-between';
+          saldoLabel.textContent = 'Por Reintegrar';
+          saldoLabel.className = 'text-[11px] font-bold uppercase tracking-wider text-amber-800';
+          saldoMonto.textContent = '$' + data.saldoAFavorEmpresa.toLocaleString('es-MX', { minimumFractionDigits: 2 });
+          saldoMonto.className = 'text-2xl sm:text-3xl font-extrabold text-amber-950 font-mono tracking-tight';
+          saldoDesc.textContent = `${emp.nombre.split(' ')[0]} debe reintegrar a la empresa`;
+        } else if (data.saldoAFavorColaborador > 0) {
+          saldoContainer.className = 'bg-gradient-to-b from-emerald-100 to-white rounded-3xl p-5 border border-emerald-400 shadow-soft-card hover:shadow-elevated transition-all flex flex-col justify-between';
+          saldoLabel.textContent = 'Por Reembolsar';
+          saldoLabel.className = 'text-[11px] font-bold uppercase tracking-wider text-emerald-900';
+          saldoMonto.textContent = '$' + data.saldoAFavorColaborador.toLocaleString('es-MX', { minimumFractionDigits: 2 });
+          saldoMonto.className = 'text-2xl sm:text-3xl font-extrabold text-emerald-950 font-mono tracking-tight';
+          saldoDesc.textContent = `Empresa reembolsará a ${emp.nombre.split(' ')[0]}`;
+        } else {
+          saldoContainer.className = 'bg-gradient-to-b from-slate-100 to-white rounded-3xl p-5 border border-slate-300 shadow-soft-card hover:shadow-elevated transition-all flex flex-col justify-between';
+          saldoLabel.textContent = 'Conciliado';
+          saldoMonto.textContent = '$0.00';
+          saldoDesc.textContent = 'Anticipo comprobado al 100%';
+        }
+      } else {
+        saldoContainer.className = 'bg-gradient-to-b from-slate-100 to-white rounded-3xl p-5 border border-slate-300 shadow-soft-card hover:shadow-elevated transition-all flex flex-col justify-between';
+        saldoLabel.textContent = 'Saldo Protegido';
+        saldoLabel.className = 'text-[11px] font-bold uppercase tracking-wider text-slate-500';
+        saldoMonto.textContent = '$ ••••••';
+        saldoMonto.className = 'text-2xl sm:text-3xl font-extrabold text-slate-400 font-mono tracking-widest';
+        saldoDesc.textContent = sesionDesbloqueada ? 'Montos ocultos temporalmente' : 'Ingresa tu clave para ver tus saldos';
+      }
+
+      const tbody = document.getElementById('tabla-comprobantes-body');
+      const badgeCount = document.getElementById('badge-total-comprobantes');
+      badgeCount.textContent = `${data.comprobantes.length} comprobantes`;
+
+      if (data.comprobantes.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="py-8 text-center text-slate-400">Aún no has agregado facturas para este viaje. Sube un XML o usa las pruebas rápidas arriba.</td></tr>`;
+      } else {
+        tbody.innerHTML = data.comprobantes.map(c => {
+          const esRechazado = (c.estatus === 'RECHAZADO');
+          const badgeEstatus = esRechazado
+            ? `<span class="bg-rose-100 text-rose-800 text-[10px] font-bold px-2.5 py-0.5 rounded-full font-sans border border-rose-200"><i class="fa-solid fa-xmark mr-1"></i>RECHAZADA</span>`
+            : `<span class="bg-emerald-50 text-emerald-800 text-[10px] font-bold px-2.5 py-0.5 rounded-full font-sans border border-emerald-200"><i class="fa-solid fa-check mr-1"></i>APROBADA</span>`;
+
+          const botonAdminAccion = adminToken
+            ? (esRechazado
+                ? `<button onclick="cambiarEstatusFacturaAdmin('${emp.id}', '${c.uuid}', 'APROBADO')" title="Aprobar esta factura" class="ml-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-2 py-0.5 rounded-lg text-[10px] transition"><i class="fa-solid fa-check mr-1"></i>Aceptar</button>`
+                : `<button onclick="confirmarRechazarFacturaAdmin('${emp.id}', '${c.uuid}', '${c.nombreEmisor.replace(/'/g, "\\'")}', ${c.total})" title="Rechazar esta factura" class="ml-2 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold px-2 py-0.5 rounded-lg text-[10px] transition"><i class="fa-solid fa-xmark mr-1"></i>Rechazar</button>`
+              )
+            : '';
+
+          return `
+            <tr class="hover:bg-slate-50/80 transition">
+              <td class="py-3 px-4">
+                <div class="font-bold text-slate-800 text-xs">${c.nombreEmisor}</div>
+                <div class="text-[10px] text-slate-400 font-mono">${c.uuid}</div>
+              </td>
+              <td class="py-3 px-4">
+                <span class="bg-slate-100 text-slate-700 px-2.5 py-0.5 rounded-full text-[10px] font-sans font-bold">${c.categoria}</span>
+              </td>
+              <td class="py-3 px-4 text-slate-600 font-mono text-[11px]">${c.fechaEmision.replace('T', ' ')}</td>
+              <td class="py-3 px-4 text-right font-bold text-slate-900">$${c.total.toFixed(2)}</td>
+              <td class="py-3 px-4 text-right font-bold ${esRechazado ? 'text-slate-400 line-through' : 'text-emerald-700'}">$${c.deducible.toFixed(2)}</td>
+              <td class="py-3 px-4 text-right font-bold ${c.excedente > 0 ? 'text-amber-700' : 'text-slate-300'}">$${c.excedente.toFixed(2)}</td>
+              <td class="py-3 px-4 text-center">
+                <div class="flex items-center justify-center">
+                  ${badgeEstatus}
+                  ${botonAdminAccion}
+                </div>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      }
+
+      // Impresión
+      document.getElementById('print-comisionado').textContent = emp.nombre;
+      document.getElementById('print-rfc').textContent = emp.rfc;
+      document.getElementById('print-destino').textContent = viaje.destino;
+      document.getElementById('print-periodo').textContent = `${viaje.fechaInicio} al ${viaje.fechaFin}`;
+      document.getElementById('print-folio').textContent = viaje.folio;
+      document.getElementById('print-anticipo').textContent = '$' + viaje.anticipoOtorgado.toLocaleString('es-MX', { minimumFractionDigits: 2 }) + ' MXN';
+      document.getElementById('print-deducible').textContent = '$' + data.totalDeducible.toLocaleString('es-MX', { minimumFractionDigits: 2 }) + ' MXN';
+      document.getElementById('print-excedente').textContent = '$' + data.totalExcedenteNoDeducible.toLocaleString('es-MX', { minimumFractionDigits: 2 }) + ' MXN';
+      document.getElementById('print-firma-empleado').textContent = emp.nombre;
+
+      if (data.saldoAFavorEmpresa > 0) {
+        document.getElementById('print-saldo-titulo').textContent = 'Saldo Neto a Reintegrar:';
+        document.getElementById('print-saldo-monto').textContent = '$' + data.saldoAFavorEmpresa.toLocaleString('es-MX', { minimumFractionDigits: 2 }) + ' MXN';
+        document.getElementById('print-saldo-sub').textContent = 'El trabajador debe reintegrar el saldo no comprobado.';
+      } else {
+        document.getElementById('print-saldo-titulo').textContent = 'Saldo Neto a Reembolsar:';
+        document.getElementById('print-saldo-monto').textContent = '$' + data.saldoAFavorColaborador.toLocaleString('es-MX', { minimumFractionDigits: 2 }) + ' MXN';
+        document.getElementById('print-saldo-sub').textContent = 'La empresa reembolsará vía transferencia bancaria.';
+      }
+
+      const printBody = document.getElementById('print-tabla-body');
+      printBody.innerHTML = data.comprobantes.map(c => `
+        <tr>
+          <td class="p-2"><span class="font-bold block">${c.nombreEmisor} (${c.rfcEmisor})</span><span class="text-[9px] text-slate-500">${c.uuid}</span></td>
+          <td class="p-2">${c.categoria}</td>
+          <td class="p-2 text-right">$${c.total.toFixed(2)}</td>
+          <td class="p-2 text-right text-emerald-800 font-bold">$${c.deducible.toFixed(2)}</td>
+          <td class="p-2 text-right text-amber-700 font-bold">$${c.excedente.toFixed(2)}</td>
+        </tr>
+      `).join('');
+    }
+
+    async function cargarEscenario(tipo, monto, categoria) {
+      try {
+        const res = await fetch(`/api/samples/${tipo}`);
+        const data = await res.json();
+        document.getElementById('textarea-xml').value = data.xmlString;
+        document.getElementById('input-monto-declarado').value = monto;
+        document.getElementById('select-categoria').value = categoria;
+        document.getElementById('badge-archivo-cargado').textContent = `Muestra cargada: ${tipo}.xml`;
+        procesarValidacionXML();
+      } catch (err) {
+        alert('Error: ' + err.message);
+      }
+    }
+
+    function leerArchivoLocal(input) {
+      const file = input.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const xmlText = e.target.result;
+        document.getElementById('textarea-xml').value = xmlText;
+        document.getElementById('badge-archivo-cargado').textContent = file.name;
+
+        const matchTotal = xmlText.match(/\bTotal\s*=\s*["']([^"']*)["']/i);
+        if (matchTotal && !document.getElementById('input-monto-declarado').value) {
+          document.getElementById('input-monto-declarado').value = matchTotal[1];
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    async function procesarValidacionXML() {
+      const xmlString = document.getElementById('textarea-xml').value;
+      const montoDeclarado = document.getElementById('input-monto-declarado').value;
+      const categoria = document.getElementById('select-categoria').value;
+      const modoFlexible = document.getElementById('check-modo-flexible').checked;
+
+      if (!xmlString) {
+        alert('Por favor selecciona o pega un XML primero.');
+        return;
+      }
+      if (!montoDeclarado) {
+        alert('Por favor ingresa el monto pagado.');
+        return;
+      }
+
+      try {
+        const res = await fetch(`/api/empleados/${empleadoActualId}/validar-comprobante`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ xmlString, montoDeclarado, categoria, modoFlexible })
+        });
+
+        const json = await res.json();
+        renderizarDiagnostico(json);
+
+        if (json.liquidacionActualizada) {
+          renderizarTodo(json.liquidacionActualizada);
+        }
+      } catch (err) {
+        alert('Error en validación: ' + err.message);
+      }
+    }
+
+    function renderizarDiagnostico(resultado) {
+      const contenedor = document.getElementById('contenedor-diagnostico');
+      const badgeEstado = document.getElementById('badge-estado-validacion');
+      const cardCfdi = document.getElementById('tarjeta-cfdi-extraido');
+
+      if (!resultado.cfdi) {
+        badgeEstado.className = 'text-xs font-bold px-3 py-1 rounded-full bg-rose-100 text-rose-800 border border-rose-300';
+        badgeEstado.textContent = 'XML INVÁLIDO';
+        contenedor.innerHTML = `
+          <div class="p-4 bg-rose-50 border border-rose-200 rounded-2xl text-xs text-rose-800 flex items-start space-x-2.5">
+            <i class="fa-solid fa-circle-exclamation text-rose-600 mt-0.5 text-base"></i>
+            <div>
+              <strong class="block font-bold">Error en la estructura del comprobante:</strong>
+              ${resultado.mensaje}
+            </div>
+          </div>
+        `;
+        cardCfdi.classList.add('hidden');
+        return;
+      }
+
+      cardCfdi.classList.remove('hidden');
+      document.getElementById('cfdi-extraido-uuid').textContent = resultado.cfdi.uuid;
+      document.getElementById('cfdi-extraido-emisor').textContent = resultado.cfdi.nombreEmisor;
+      document.getElementById('cfdi-extraido-fecha').textContent = resultado.cfdi.fechaEmision.replace('T', ' ');
+      document.getElementById('cfdi-extraido-pago').textContent = `${resultado.cfdi.metodoPago} / Forma ${resultado.cfdi.formaPago}`;
+      document.getElementById('cfdi-extraido-total').textContent = `$${resultado.cfdi.total.toFixed(2)} ${resultado.cfdi.moneda}`;
+
+      if (resultado.success) {
+        badgeEstado.className = 'text-xs font-bold px-3 py-1 rounded-full bg-emerald-100 text-emerald-900 border border-emerald-300';
+        badgeEstado.innerHTML = '<i class="fa-solid fa-check mr-1"></i> APROBADO Y REGISTRADO';
+      } else {
+        badgeEstado.className = 'text-xs font-bold px-3 py-1 rounded-full bg-rose-100 text-rose-900 border border-rose-300';
+        badgeEstado.innerHTML = '<i class="fa-solid fa-xmark mr-1"></i> RECHAZADO';
+      }
+
+      contenedor.innerHTML = resultado.validacion.reglas.map(r => `
+        <div class="p-3 rounded-2xl border text-xs flex items-start space-x-3 transition ${r.pasa ? 'bg-emerald-50/40 border-emerald-200/90' : 'bg-rose-50/70 border-rose-300'}">
+          <i class="fa-solid ${r.pasa ? 'fa-circle-check text-emerald-600' : 'fa-circle-xmark text-rose-600'} text-base mt-0.5"></i>
+          <div class="flex-1">
+            <div class="font-bold ${r.pasa ? 'text-emerald-950' : 'text-rose-950'} flex items-center justify-between">
+              <span>${r.nombre}</span>
+              <span class="text-[9px] font-mono font-bold uppercase px-2 py-0.5 rounded-full ${r.pasa ? 'bg-emerald-200 text-emerald-900' : 'bg-rose-200 text-rose-900'}">
+                ${r.pasa ? 'CUMPLE' : 'NO CUMPLE'}
+              </span>
+            </div>
+            <p class="text-[11px] ${r.pasa ? 'text-emerald-800' : 'text-rose-800'} mt-1 leading-snug">${r.detalle}</p>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function abrirModalImpresion() {
+      document.getElementById('modal-impresion').classList.remove('hidden');
+    }
+
+    function cerrarModalImpresion() {
+      document.getElementById('modal-impresion').classList.add('hidden');
+    }
+  </script>
+</body>
+</html>

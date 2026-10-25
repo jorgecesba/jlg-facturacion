@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cfdi:Comprobante 
+    xmlns:cfdi="http://www.sat.gob.mx/cfd/4" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xmlns:tfd="http://www.sat.gob.mx/TimbreFiscalDigital" 
+    xsi:schemaLocation="http://www.sat.gob.mx/cfd/4 http://www.sat.gob.mx/sitio_internet/cfd/4/cfdv40.xsd http://www.sat.gob.mx/TimbreFiscalDigital http://www.sat.gob.mx/sitio_internet/cfd/TimbreFiscalDigital/TimbreFiscalDigitalv11.xsd" 
+    Version="4.0" 
+    Serie="FA" 
+    Folio="10842" 
+    Fecha="2026-10-21T15:20:45" 
+    FormaPago="04" 
+    SubTotal="844.83" 
+    Moneda="MXN" 
+    Total="980.00" 
+    TipoDeComprobante="I" 
+    Exportacion="01" 
+    MetodoPago="PUE" 
+    LugarExpedicion="64000">
+
+  <!-- EMISOR: Restaurante en Monterrey NL -->
+  <cfdi:Emisor 
+      Rfc="SGM150612AB1" 
+      Nombre="SERVICIOS GASTRONOMICOS DE MONTERREY SA DE CV" 
+      RegimenFiscal="601"/>
+
+  <!-- RECEPTOR: Empresa titular del viaje autorizado -->
+  <cfdi:Receptor 
+      Rfc="GME980512ABC" 
+      Nombre="GRUPO MERCANTIL EMPRESARIAL SA DE CV" 
+      DomicilioFiscalReceptor="64000" 
+      RegimenFiscalReceptor="601" 
+      UsoCFDI="G03"/>
+
+  <!-- CONCEPTOS: Consumo de alimentos con código del catálogo SAT -->
+  <cfdi:Conceptos>
+    <cfdi:Concepto 
+        ClaveProdServ="90101501" 
+        NoIdentificacion="CONS-01" 
+        Cantidad="1" 
+        ClaveUnidad="E48" 
+        Unidad="Servicio" 
+        Descripcion="CONSUMO DE ALIMENTOS Y BEBIDAS EN COMISION DE TRABAJO" 
+        ValorUnitario="844.83" 
+        Importe="844.83" 
+        ObjetoImp="02">
+      <cfdi:Impuestos>
+        <cfdi:Traslados>
+          <cfdi:Traslado Base="844.83" Impuesto="002" TipoFactor="Tasa" TasaOCuota="0.160000" Importe="135.17"/>
+        </cfdi:Traslados>
+      </cfdi:Impuestos>
+    </cfdi:Concepto>
+  </cfdi:Conceptos>
+
+  <!-- RESUMEN DE IMPUESTOS: IVA al 16% -->
+  <cfdi:Impuestos TotalImpuestosTrasladados="135.17">
+    <cfdi:Traslados>
+      <cfdi:Traslado Impuesto="002" TipoFactor="Tasa" TasaOCuota="0.160000" Importe="135.17" Base="844.83"/>
+    </cfdi:Traslados>
+  </cfdi:Impuestos>
+
+  <!-- COMPLEMENTO FISCAL: TIMBRE FISCAL DIGITAL DEL SAT (PAC CERTIFICADOR) -->
+  <cfdi:Complemento>
+    <tfd:TimbreFiscalDigital 
+        Version="1.1" 
+        UUID="A3E8B7C9-2F10-4A55-9C4D-7E6F890123AB" 
+        FechaTimbrado="2026-10-21T15:21:12" 
+        RfcProvCertif="SAT970701NN3" 
+        SelloCFD="Bv97XkQy5F0z3mLj7K8...simulado..." 
+        NoCertificadoSAT="00001000000504465028" 
+        SelloSAT="zP19qW8e7R6t5Y4u3...simulado..."/>
+  </cfdi:Complemento>
+
+</cfdi:Comprobante>
