@@ -283,20 +283,27 @@ style_table(tbl_api, [0.8, 2.3, 1.8, 1.6],
     ])
 
 # ==========================================
-# 7. GUÍA RÁPIDA DE CONEXIÓN Y USO
+# 7. GUÍA RÁPIDA DE CONEXIÓN Y USO (CLOUD 24/7)
 # ==========================================
 add_header(doc, "7. Guía Rápida para Abrir el Portal y Conectar la App", level=1)
 
-add_header(doc, "7.1 Cómo Abrir el Portal en tu Computadora", level=2)
-add_p(doc, "Abre Google Chrome, Edge o Firefox e ingresa a: http://localhost:4000", "Paso 1: Navegador:")
-add_p(doc, "Toca la tarjeta de tu nombre e introduce tu clave confidencial (ej. JALM-2026).", "Paso 2: Modo Colaborador:")
-add_p(doc, "Haz clic en 'Acceso Administrador' e introduce DamianSpears_Owner / Papaleta723! para acceder a la pestaña de administración y auditar facturas.", "Paso 3: Modo Administrador:")
+add_callout(doc, "Despliegue Cloud en Vivo 24/7 (100% Gratuito)",
+    "• URL Oficial en la Nube: https://jlg-facturacion.onrender.com/\n"
+    "• Estado: Producción Activa (Live)\n"
+    "• Disponibilidad: 24 horas del día, los 365 días del año sin necesidad de encender la computadora del administrador.\n"
+    "• Conectividad: Acceso universal desde cualquier red Wi-Fi o datos móviles (4G/5G).",
+    bg_hex="F0FDF4", border_hex="10B981")
 
-add_header(doc, "7.2 Cómo Conectar los Celulares de los Usuarios", level=2)
-add_p(doc, "Copia el archivo 'JLG_Facturacion.apk' a los celulares de los colaboradores (vía USB, WhatsApp o correo) e instálalo habilitando 'Instalar apps desconocidas'.", "Paso 1: Instalación:")
-add_p(doc, "Los celulares deben estar conectados a la misma red WiFi que la computadora.", "Paso 2: Red WiFi:")
-add_p(doc, "En la esquina superior derecha de la app, presiona el engrane ⚙️ e introduce la dirección IP de tu computadora (ej. http://192.168.100.52:4000/).", "Paso 3: Servidor:")
-add_p(doc, "La app sincronizará de inmediato el catálogo de colaboradores y permitirá subir comprobantes XML con validación en vivo.", "Paso 4: Uso Diario:")
+add_header(doc, "7.1 Cómo Abrir el Portal Web en Cualquier Computadora o Celular", level=2)
+add_p(doc, "Abre cualquier navegador web (Chrome, Edge, Safari, Firefox) e ingresa directamente a: https://jlg-facturacion.onrender.com/", "Paso 1: Acceso Directo:")
+add_p(doc, "Toca la tarjeta de tu nombre e introduce tu clave confidencial alfanumérica (ej. JALM-2026, SCNR-2026). Tus saldos se revelarán.", "Paso 2: Modo Colaborador:")
+add_p(doc, "Haz clic en 'Acceso Administrador' e introduce DamianSpears_Owner / Papaleta723! para acceder a la pestaña de administración, auditar facturas de cada colaborador y Aceptar o Rechazar gastos.", "Paso 3: Modo Administrador:")
+
+add_header(doc, "7.2 Cómo Conectar los Celulares de los Usuarios (App Android)", level=2)
+add_p(doc, "Copia el archivo 'JLG_Facturacion.apk' a los celulares de los colaboradores (vía WhatsApp, correo o Google Drive) e instálalo habilitando 'Instalar apps desconocidas'.", "Paso 1: Instalación:")
+add_p(doc, "La aplicación ya viene configurada de fábrica con la URL cloud 'https://jlg-facturacion.onrender.com/api/'. En cuanto el colaborador abre la app, esta se conecta automáticamente a la nube.", "Paso 2: Conexión Automática:")
+add_p(doc, "Los colaboradores pueden estar en su casa, en la oficina o en carretera con datos móviles 4G/5G. No se requiere estar en la misma red Wi-Fi.", "Paso 3: Conexión Universal:")
+add_p(doc, "Si en el futuro se desea apuntar a otro servidor privado o red local, la app cuenta con el botón de engrane ⚙️ en la esquina superior derecha para personalizar la URL del backend.", "Paso 4: Flexibilidad de Servidor:")
 
 # Guardar documento
 output_path = r"C:\Users\Jorge\Desktop\Damian\portal-viaticos\Documentacion_Portal_Viaticos_Mexico.docx"
