@@ -294,10 +294,11 @@ add_callout(doc, "Despliegue Cloud en Vivo 24/7 (100% Gratuito)",
     "• Conectividad: Acceso universal desde cualquier red Wi-Fi o datos móviles (4G/5G).",
     bg_hex="F0FDF4", border_hex="10B981")
 
-add_header(doc, "7.1 Cómo Abrir el Portal Web en Cualquier Computadora o Celular", level=2)
-add_p(doc, "Abre cualquier navegador web (Chrome, Edge, Safari, Firefox) e ingresa directamente a: https://jlg-facturacion.onrender.com/", "Paso 1: Acceso Directo:")
-add_p(doc, "Toca la tarjeta de tu nombre e introduce tu clave confidencial alfanumérica (ej. JALM-2026, SCNR-2026). Tus saldos se revelarán.", "Paso 2: Modo Colaborador:")
-add_p(doc, "Haz clic en 'Acceso Administrador' e introduce DamianSpears_Owner / Papaleta723! para acceder a la pestaña de administración, auditar facturas de cada colaborador y Aceptar o Rechazar gastos.", "Paso 3: Modo Administrador:")
+add_header(doc, "7.1 Cómo Usar la Nueva Pantalla de Inicio / Bienvenida del Portal", level=2)
+add_p(doc, "Abre cualquier navegador web (Chrome, Edge, Safari, Firefox) e ingresa directamente a: https://jlg-facturacion.onrender.com/ El sistema te recibirá con la nueva Pantalla de Inicio y Bienvenida corporativa.", "Paso 1: Acceso Directo:")
+add_p(doc, "En la tarjeta izquierda 'Acceso a Comisionados', despliega el selector por Nombre Completo, visualiza tu resumen de viaje (destino, RFC, avatar) e introduce tu clave alfanumérica confidencial (ej. JALM-2026). Al presionar 'Ingresar a mis Viáticos', accederás directamente a tu comprobación y subida de XML.", "Paso 2: Acceso por Nombre Completo (Colaboradores):")
+add_p(doc, "En la tarjeta derecha 'Iniciar como Administrador', introduce las credenciales maestras (DamianSpears_Owner / Papaleta723!) y haz clic en 'Iniciar como Administrador'. Accederás inmediatamente al Panel de Auditoría para aprobar o rechazar facturas y dar de alta nuevo personal.", "Paso 3: Acceso Directo de Administrador:")
+add_p(doc, "Tanto en el portal de comprobación como en el panel administrador dispones del botón 'Cerrar Sesión / Cambiar Colaborador' en la barra superior para volver de manera inmediata y segura a la Pantalla de Inicio.", "Paso 4: Cambio de Usuario y Cierre de Sesión:")
 
 add_header(doc, "7.2 Cómo Conectar los Celulares de los Usuarios (App Android)", level=2)
 add_p(doc, "Copia el archivo 'JLG_Facturacion.apk' a los celulares de los colaboradores (vía WhatsApp, correo o Google Drive) e instálalo habilitando 'Instalar apps desconocidas'.", "Paso 1: Instalación:")
