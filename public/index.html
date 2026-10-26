@@ -55,30 +55,34 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-wrap items-center justify-between gap-4">
       
       <!-- Logo y Nombre de la Empresa -->
-      <div class="flex items-center space-x-3.5">
-        <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-emerald-800 to-teal-600 flex items-center justify-center text-white shadow-soft-card">
+      <a href="javascript:void(0)" onclick="mostrarVista('bienvenida')" class="flex items-center space-x-3.5 group cursor-pointer" title="Ir a la pantalla de bienvenida">
+        <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-emerald-800 to-teal-600 flex items-center justify-center text-white shadow-soft-card group-hover:scale-105 transition-transform">
           <i class="fa-solid fa-receipt text-lg"></i>
         </div>
         <div>
           <div class="flex items-center space-x-2">
-            <span class="text-sm font-bold tracking-tight text-slate-900">Jlg Facturacion</span>
+            <span class="text-sm font-bold tracking-tight text-slate-900 group-hover:text-emerald-800 transition-colors">Jlg Facturacion</span>
             <span class="bg-emerald-50 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-full border border-emerald-200">
               CFDI 4.0 SAT
             </span>
           </div>
           <span class="text-xs text-slate-500 font-medium">Grupo Mercantil Empresarial S.A. de C.V.</span>
         </div>
-      </div>
+      </a>
 
       <!-- PESTAÑAS PRINCIPALES DEL PORTAL Y BOTÓN SINCRONIZAR -->
       <div class="flex items-center space-x-2">
         <div class="flex items-center bg-slate-100/90 rounded-2xl p-1 border border-slate-200/80">
-          <button id="tab-btn-viaticos" onclick="cambiarPestana('viaticos')" class="px-4 py-1.5 rounded-xl text-xs font-bold transition-all bg-white text-slate-900 shadow-sm">
+          <button id="tab-btn-bienvenida" onclick="mostrarVista('bienvenida')" class="px-4 py-1.5 rounded-xl text-xs font-bold transition-all bg-white text-slate-900 shadow-sm">
+            <i class="fa-solid fa-house mr-1.5 text-slate-600"></i> Inicio
+          </button>
+
+          <button id="tab-btn-viaticos" onclick="mostrarVista('viaticos')" class="px-4 py-1.5 rounded-xl text-xs font-bold transition-all text-slate-600 hover:text-slate-900">
             <i class="fa-solid fa-plane-departure mr-1.5 text-emerald-600"></i> Comprobación de Viáticos
           </button>
 
           <!-- Pestaña exclusiva de Administración (Oculta por defecto para usuarios normales) -->
-          <button id="tab-btn-admin" onclick="cambiarPestana('admin')" class="hidden px-4 py-1.5 rounded-xl text-xs font-bold transition-all text-slate-600 hover:text-slate-900">
+          <button id="tab-btn-admin" onclick="mostrarVista('admin')" class="hidden px-4 py-1.5 rounded-xl text-xs font-bold transition-all text-slate-600 hover:text-slate-900">
             <i class="fa-solid fa-shield-halved mr-1.5 text-indigo-600"></i> Administración de Usuarios
             <span class="ml-1.5 bg-indigo-100 text-indigo-800 text-[9px] px-1.5 py-0.2 rounded-full font-extrabold uppercase">Admin</span>
           </button>
@@ -92,9 +96,21 @@
 
       <!-- CONTROLES DE SESIÓN -->
       <div class="flex items-center space-x-3">
-        <!-- ESTADO: NO AUTENTICADO COMO ADMIN -->
+        <!-- ESTADO: COLABORADOR AUTENTICADO -->
+        <div id="contenedor-colab-badge" class="hidden flex items-center space-x-2">
+          <div class="bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs font-semibold px-3 py-1.5 rounded-xl flex items-center space-x-2">
+            <span class="w-2 h-2 rounded-full bg-emerald-600 animate-pulse"></span>
+            <span class="font-bold truncate max-w-[130px]" id="navbar-colab-nombre">Colaborador</span>
+          </div>
+          <button onclick="volverABienvenida()" title="Cambiar de colaborador" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold px-3 py-2 rounded-xl transition flex items-center space-x-1.5 cursor-pointer">
+            <i class="fa-solid fa-arrow-right-from-bracket"></i>
+            <span class="hidden sm:inline">Cambiar</span>
+          </button>
+        </div>
+
+        <!-- ESTADO: NO AUTENTICADO COMO ADMIN (Trigger) -->
         <div id="contenedor-login-trigger">
-          <button onclick="abrirModalLoginAdmin()" class="bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 text-xs font-bold px-3.5 py-2 rounded-xl border border-slate-200 shadow-sm flex items-center space-x-2 transition">
+          <button onclick="irALoginAdmin()" class="bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 text-xs font-bold px-3.5 py-2 rounded-xl border border-slate-200 shadow-sm flex items-center space-x-2 transition cursor-pointer">
             <i class="fa-solid fa-lock text-slate-400"></i>
             <span>Acceso Administrador</span>
           </button>
@@ -106,7 +122,7 @@
             <span class="w-2 h-2 rounded-full bg-indigo-600 animate-pulse"></span>
             <span class="font-mono font-bold" id="label-admin-username">DamianSpears_Owner</span>
           </div>
-          <button onclick="cerrarSesionAdmin()" title="Cerrar sesión de administrador" class="bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-bold px-3 py-2 rounded-xl transition flex items-center space-x-1.5">
+          <button onclick="cerrarSesionAdmin()" title="Cerrar sesión de administrador" class="bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-bold px-3 py-2 rounded-xl transition flex items-center space-x-1.5 cursor-pointer">
             <i class="fa-solid fa-arrow-right-from-bracket"></i>
             <span class="hidden sm:inline">Salir</span>
           </button>
@@ -117,9 +133,231 @@
   </nav>
 
   <!-- ========================================================================= -->
+  <!-- VISTA 0: PANTALLA DE BIENVENIDA / INICIO (SELECCIÓN DE ACCESO)            -->
+  <!-- ========================================================================= -->
+  <main id="vista-bienvenida" class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 flex-1 w-full flex flex-col justify-center items-center space-y-8 animate-fadeIn">
+    
+    <!-- ENCABEZADO PRINCIPAL DE BIENVENIDA -->
+    <div class="text-center max-w-2xl mx-auto space-y-3">
+      <div class="inline-flex items-center space-x-2 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold px-3.5 py-1.5 rounded-full shadow-sm">
+        <i class="fa-solid fa-building-shield text-emerald-600"></i>
+        <span>Grupo Mercantil Empresarial S.A. de C.V. • CFDI 4.0 SAT</span>
+      </div>
+      <h1 class="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight">
+        Portal Integral de Viáticos y Comprobación Fiscal
+      </h1>
+      <p class="text-sm sm:text-base text-slate-600 font-medium">
+        Selecciona tu nombre completo para acceder a tu comprobación de gastos o ingresa como Administrador para auditoría y gestión de personal.
+      </p>
+    </div>
+
+    <!-- TARJETAS DE ACCESO (GRID DE 2 COLUMNAS ESTÉTICO) -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 w-full max-w-5xl">
+
+      <!-- TARJETA A: ACCESO COLABORADORES (POR NOMBRE COMPLETO) -->
+      <div class="bg-white/95 backdrop-blur-md rounded-3xl p-6 sm:p-8 border-2 border-emerald-500/30 shadow-soft-card hover:shadow-elevated transition-all flex flex-col justify-between space-y-6 relative overflow-hidden group">
+        <!-- Decoración de fondo suave -->
+        <div class="absolute -top-12 -right-12 w-40 h-40 bg-emerald-100/40 rounded-full blur-2xl pointer-events-none group-hover:scale-110 transition-transform"></div>
+
+        <div class="space-y-5 relative z-10">
+          <!-- Cabecera de la Tarjeta Colaborador -->
+          <div class="flex items-start justify-between pb-4 border-b border-slate-100 gap-3">
+            <div class="flex items-center space-x-3.5">
+              <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-700 flex items-center justify-center text-white shadow-md">
+                <i class="fa-solid fa-user-check text-xl"></i>
+              </div>
+              <div>
+                <h2 class="text-lg font-bold text-slate-900">Acceso a Comisionados</h2>
+                <p class="text-xs text-slate-500">Comprobación de viáticos y subida de XML</p>
+              </div>
+            </div>
+            <span class="bg-emerald-50 text-emerald-800 text-[11px] font-bold px-2.5 py-1 rounded-full border border-emerald-200">
+              Colaborador
+            </span>
+          </div>
+
+          <!-- Selector de Nombre Completo -->
+          <div class="space-y-1.5">
+            <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center justify-between">
+              <span>Selecciona por Nombre Completo:</span>
+              <span class="text-[10px] text-slate-400 font-normal">Personal Autorizado</span>
+            </label>
+            <div class="relative">
+              <select id="welcome-select-colaborador" onchange="actualizarPreviaColaboradorBienvenida()" class="w-full bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-2xl p-3.5 pr-10 text-sm font-semibold text-slate-900 focus:bg-white focus:ring-2 focus:ring-emerald-500 focus:outline-none transition appearance-none cursor-pointer">
+                <option value="">Cargando colaboradores...</option>
+              </select>
+              <i class="fa-solid fa-chevron-down absolute right-4 top-4 text-slate-400 pointer-events-none text-xs"></i>
+            </div>
+          </div>
+
+          <!-- Vista Previa Dinámica del Colaborador Seleccionado -->
+          <div id="welcome-colab-preview" class="bg-gradient-to-tr from-slate-50 to-emerald-50/40 rounded-2xl p-4 border border-slate-200/90 flex items-center space-x-4">
+            <div id="welcome-preview-avatar" class="w-13 h-13 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-800 text-white font-bold text-base flex items-center justify-center shadow-md shrink-0">
+              JL
+            </div>
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center space-x-2">
+                <h3 id="welcome-preview-nombre" class="text-sm font-bold text-slate-900 truncate">Julián Alberto López Morales</h3>
+              </div>
+              <p id="welcome-preview-puesto" class="text-xs text-slate-500 truncate">Gerente de Operaciones y Logística</p>
+              <div class="flex items-center space-x-3 mt-1.5 text-[11px] text-slate-600">
+                <span id="welcome-preview-destino" class="flex items-center truncate">
+                  <i class="fa-solid fa-plane-departure text-emerald-600 mr-1.5"></i> Monterrey, N.L.
+                </span>
+                <span id="welcome-preview-rfc" class="font-mono text-slate-400 truncate">
+                  RFC: LOMJ880914HC3
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Campo de Clave Única / Contraseña -->
+          <div class="space-y-1.5">
+            <label class="block text-xs font-bold uppercase tracking-wider text-slate-700">
+              Clave Única Alfanumérica / Contraseña:
+            </label>
+            <div class="relative">
+              <input type="password" id="welcome-colab-clave" placeholder="Ingresa tu clave asignada (Ej. JALM-2026)" class="w-full text-sm font-mono font-bold tracking-wider uppercase p-3.5 pr-11 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:ring-2 focus:ring-emerald-500 focus:outline-none transition" onkeydown="if(event.key==='Enter') ejecutarIngresoColaboradorBienvenida()">
+              <button type="button" onclick="togglePasswordVisibility('welcome-colab-clave', this)" class="absolute right-3.5 top-3.5 text-slate-400 hover:text-slate-600 text-sm p-1">
+                <i class="fa-solid fa-eye"></i>
+              </button>
+            </div>
+            <p class="text-[11px] text-slate-400 flex items-center">
+              <i class="fa-solid fa-shield-halved text-[10px] mr-1.5 text-emerald-600"></i> Clave confidencial y personal de cada comisionado.
+            </p>
+          </div>
+
+          <!-- Mensaje de Error Colaborador -->
+          <div id="welcome-colab-error" class="hidden p-3 bg-rose-50 border border-rose-200 text-rose-800 text-xs rounded-xl flex items-center space-x-2">
+            <i class="fa-solid fa-triangle-exclamation text-rose-600"></i>
+            <span id="welcome-colab-error-texto">Clave incorrecta.</span>
+          </div>
+        </div>
+
+        <!-- Botón de Ingreso Colaborador -->
+        <div class="pt-4 relative z-10">
+          <button onclick="ejecutarIngresoColaboradorBienvenida()" id="btn-welcome-ingreso-colab" class="w-full py-3.5 px-5 bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-700 hover:to-teal-800 text-white font-bold rounded-2xl shadow-soft-card hover:shadow-elevated transition-all flex items-center justify-center space-x-2 cursor-pointer active:scale-[0.99]">
+            <span>Ingresar a mis Viáticos</span>
+            <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- TARJETA B: INICIAR COMO ADMINISTRADOR -->
+      <div class="bg-white/95 backdrop-blur-md rounded-3xl p-6 sm:p-8 border-2 border-indigo-500/30 shadow-soft-card hover:shadow-elevated transition-all flex flex-col justify-between space-y-6 relative overflow-hidden group">
+        <!-- Decoración de fondo suave -->
+        <div class="absolute -top-12 -right-12 w-40 h-40 bg-indigo-100/40 rounded-full blur-2xl pointer-events-none group-hover:scale-110 transition-transform"></div>
+
+        <div class="space-y-5 relative z-10">
+          <!-- Cabecera de la Tarjeta Admin -->
+          <div class="flex items-start justify-between pb-4 border-b border-slate-100 gap-3">
+            <div class="flex items-center space-x-3.5">
+              <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-indigo-700 to-purple-700 flex items-center justify-center text-white shadow-md">
+                <i class="fa-solid fa-shield-halved text-xl"></i>
+              </div>
+              <div>
+                <h2 class="text-lg font-bold text-slate-900">Iniciar como Administrador</h2>
+                <p class="text-xs text-slate-500">Auditoría, aprobación y gestión de usuarios</p>
+              </div>
+            </div>
+            <span class="bg-indigo-50 text-indigo-800 text-[11px] font-bold px-2.5 py-1 rounded-full border border-indigo-200">
+              Admin Portal
+            </span>
+          </div>
+
+          <!-- Campo Usuario Administrador -->
+          <div class="space-y-1.5">
+            <label class="block text-xs font-bold uppercase tracking-wider text-slate-700">
+              Usuario Administrador:
+            </label>
+            <div class="relative">
+              <input type="text" id="welcome-admin-user" value="DamianSpears_Owner" placeholder="Usuario administrador" class="w-full text-sm font-semibold p-3.5 pl-11 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
+              <i class="fa-solid fa-user-shield absolute left-4 top-4 text-slate-400"></i>
+            </div>
+          </div>
+
+          <!-- Campo Contraseña Administrador -->
+          <div class="space-y-1.5">
+            <label class="block text-xs font-bold uppercase tracking-wider text-slate-700">
+              Contraseña de Administrador:
+            </label>
+            <div class="relative">
+              <input type="password" id="welcome-admin-pass" placeholder="••••••••••••" class="w-full text-sm font-semibold p-3.5 pl-11 pr-11 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:outline-none transition" onkeydown="if(event.key==='Enter') ejecutarLoginAdminBienvenida()">
+              <i class="fa-solid fa-lock absolute left-4 top-4 text-slate-400"></i>
+              <button type="button" onclick="togglePasswordVisibility('welcome-admin-pass', this)" class="absolute right-3.5 top-3.5 text-slate-400 hover:text-slate-600 text-sm p-1">
+                <i class="fa-solid fa-eye"></i>
+              </button>
+            </div>
+            <p class="text-[11px] text-slate-400 flex items-center">
+              <i class="fa-solid fa-key text-[10px] mr-1.5 text-indigo-600"></i> Acceso con privilegios de aprobación fiscal y altas de colaboradores.
+            </p>
+          </div>
+
+          <!-- Mensaje de Error Admin -->
+          <div id="welcome-admin-error" class="hidden p-3 bg-rose-50 border border-rose-200 text-rose-800 text-xs rounded-xl flex items-center space-x-2">
+            <i class="fa-solid fa-triangle-exclamation text-rose-600"></i>
+            <span id="welcome-admin-error-texto">Credenciales inválidas.</span>
+          </div>
+        </div>
+
+        <!-- Botón de Ingreso Administrador -->
+        <div class="pt-4 relative z-10">
+          <button onclick="ejecutarLoginAdminBienvenida()" id="btn-welcome-ingreso-admin" class="w-full py-3.5 px-5 bg-gradient-to-r from-indigo-600 to-purple-700 hover:from-indigo-700 hover:to-purple-800 text-white font-bold rounded-2xl shadow-soft-card hover:shadow-elevated transition-all flex items-center justify-center space-x-2 cursor-pointer active:scale-[0.99]">
+            <i class="fa-solid fa-lock-open mr-1"></i>
+            <span>Iniciar como Administrador</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- PIE INFORMATIVO -->
+    <div class="flex flex-wrap items-center justify-center gap-6 text-xs text-slate-500 pt-4">
+      <div class="flex items-center space-x-2 bg-white/80 px-3.5 py-1.5 rounded-full border border-slate-200 shadow-sm">
+        <i class="fa-solid fa-arrows-rotate text-emerald-600"></i>
+        <span>Sincronización en vivo con App Móvil Android</span>
+      </div>
+      <div class="flex items-center space-x-2 bg-white/80 px-3.5 py-1.5 rounded-full border border-slate-200 shadow-sm">
+        <i class="fa-solid fa-receipt text-indigo-600"></i>
+        <span>Validación estricta de XML CFDI 4.0</span>
+      </div>
+      <div class="flex items-center space-x-2 bg-white/80 px-3.5 py-1.5 rounded-full border border-slate-200 shadow-sm">
+        <i class="fa-solid fa-shield-halved text-slate-500"></i>
+        <span>Cifrado y auditoría conforme al Art. 28 LISR</span>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ========================================================================= -->
   <!-- VISTA 1: COMPROBACIÓN DE VIÁTICOS (ACCESIBLE PARA COLABORADORES)          -->
   <!-- ========================================================================= -->
-  <main id="vista-viaticos" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-7 flex-1 w-full space-y-7">
+  <main id="vista-viaticos" class="hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-7 flex-1 w-full space-y-7 animate-fadeIn">
+
+    <!-- BANNER DE SESIÓN ACTIVA DEL COLABORADOR Y BOTÓN CAMBIAR DE USUARIO -->
+    <div class="bg-white/95 backdrop-blur-sm rounded-3xl p-4 sm:p-5 border border-slate-200/90 shadow-soft-card flex flex-wrap items-center justify-between gap-4">
+      <div class="flex items-center space-x-3.5">
+        <div id="colab-banner-avatar" class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-800 text-white font-bold text-sm flex items-center justify-center shadow-md">
+          JL
+        </div>
+        <div>
+          <div class="flex items-center space-x-2">
+            <h2 id="colab-banner-nombre" class="text-base font-bold text-slate-900 leading-tight">Julián Alberto López Morales</h2>
+            <span class="bg-emerald-100 text-emerald-800 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider border border-emerald-200">
+              <i class="fa-solid fa-circle-check mr-1 text-emerald-600"></i>Sesión Activa
+            </span>
+          </div>
+          <p id="colab-banner-sub" class="text-xs text-slate-500 mt-0.5">Gerente de Operaciones y Logística • Destino: Monterrey, Nuevo León</p>
+        </div>
+      </div>
+
+      <div class="flex items-center space-x-2">
+        <button onclick="volverABienvenida()" title="Regresar a la pantalla de bienvenida para seleccionar otro usuario" class="bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-700 hover:text-slate-900 text-xs font-bold px-4 py-2 rounded-xl border border-slate-200 shadow-sm flex items-center space-x-2 transition cursor-pointer">
+          <i class="fa-solid fa-arrow-right-from-bracket text-slate-500"></i>
+          <span>Cerrar Sesión / Cambiar Colaborador</span>
+        </button>
+      </div>
+    </div>
 
     <!-- SECCIÓN 1: SELECTOR VISUAL DE COLABORADORES CON CLAVE ÚNICA -->
     <div id="seccion-empleados" class="bg-white/90 backdrop-blur-sm rounded-3xl p-6 border border-slate-200/90 shadow-soft-card">
@@ -988,8 +1226,10 @@
       document.getElementById('print-fecha-hoy').textContent = 'Fecha Emisión: ' + new Date().toLocaleDateString('es-MX');
       await verificarSesionAdmin();
       await cargarListaEmpleados();
-      // Inicialmente bloqueado hasta ingresar clave, o desbloqueado si ya autenticó
       await cargarViajeEmpleado(empleadoActualId);
+
+      // Iniciar por defecto en la pantalla de bienvenida estética
+      mostrarVista('bienvenida');
 
       // Sincronización en vivo con la App Móvil: recarga periódica silenciosa cada 3 segundos
       setInterval(async () => {
@@ -1006,6 +1246,7 @@
             if (jsonEmp.success) {
               catalogoEmpleados = jsonEmp.empleados;
               renderizarSelectorEmpleados(catalogoEmpleados);
+              renderizarSelectBienvenida(catalogoEmpleados);
             }
           } catch (e) {
             // Silencioso en caso de pérdida temporal de conexión
@@ -1090,32 +1331,270 @@
       }, 2500);
     }
 
-    // Control de Pestañas
-    function cambiarPestana(tab) {
+    // ==========================================
+    // CONTROL CENTRALIZADO DE PESTAÑAS Y VISTAS
+    // ==========================================
+    function mostrarVista(vista) {
+      const vBienvenida = document.getElementById('vista-bienvenida');
       const vViaticos = document.getElementById('vista-viaticos');
       const vAdmin = document.getElementById('vista-admin');
+
+      const btnBienvenida = document.getElementById('tab-btn-bienvenida');
       const btnViaticos = document.getElementById('tab-btn-viaticos');
       const btnAdmin = document.getElementById('tab-btn-admin');
 
-      if (tab === 'viaticos') {
+      const colabBadge = document.getElementById('contenedor-colab-badge');
+      const loginTrigger = document.getElementById('contenedor-login-trigger');
+
+      // Validar acceso a Viáticos si aún no se ha desbloqueado la sesión
+      if (vista === 'viaticos' && !sesionDesbloqueada) {
+        mostrarToastSincronizacion('Selecciona tu usuario e ingresa tu clave primero', true);
+        vista = 'bienvenida';
+        setTimeout(() => {
+          const claveInput = document.getElementById('welcome-colab-clave');
+          if (claveInput) claveInput.focus();
+        }, 150);
+      }
+
+      // Validar acceso a Administración si no hay token
+      if (vista === 'admin' && !adminToken) {
+        vista = 'bienvenida';
+        setTimeout(() => {
+          const passAdmin = document.getElementById('welcome-admin-pass');
+          if (passAdmin) {
+            passAdmin.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            passAdmin.focus();
+          }
+        }, 150);
+      }
+
+      const estiloActivo = "px-4 py-1.5 rounded-xl text-xs font-bold transition-all bg-white text-slate-900 shadow-sm";
+      const estiloInactivo = "px-4 py-1.5 rounded-xl text-xs font-bold transition-all text-slate-600 hover:text-slate-900";
+
+      // Ocultar todas las vistas
+      vBienvenida.classList.add('hidden');
+      vViaticos.classList.add('hidden');
+      vAdmin.classList.add('hidden');
+
+      if (btnBienvenida) btnBienvenida.className = estiloInactivo;
+      if (btnViaticos) btnViaticos.className = estiloInactivo;
+      if (btnAdmin) btnAdmin.className = estiloInactivo;
+
+      if (vista === 'bienvenida') {
+        vBienvenida.classList.remove('hidden');
+        if (btnBienvenida) btnBienvenida.className = estiloActivo;
+        if (colabBadge) colabBadge.classList.add('hidden');
+        if (loginTrigger && !adminToken) loginTrigger.classList.remove('hidden');
+      } else if (vista === 'viaticos') {
         vViaticos.classList.remove('hidden');
-        vAdmin.classList.add('hidden');
-        btnViaticos.className = "px-4 py-1.5 rounded-xl text-xs font-bold transition-all bg-white text-slate-900 shadow-sm";
-        btnAdmin.className = "px-4 py-1.5 rounded-xl text-xs font-bold transition-all text-slate-600 hover:text-slate-900";
-      } else if (tab === 'admin') {
-        if (!adminToken) {
-          abrirModalLoginAdmin();
-          return;
+        if (btnViaticos) btnViaticos.className = estiloActivo;
+        if (sesionDesbloqueada && colabBadge) {
+          colabBadge.classList.remove('hidden');
+          if (loginTrigger) loginTrigger.classList.add('hidden');
         }
-        vViaticos.classList.add('hidden');
+      } else if (vista === 'admin') {
         vAdmin.classList.remove('hidden');
-        btnAdmin.className = "px-4 py-1.5 rounded-xl text-xs font-bold transition-all bg-white text-slate-900 shadow-sm";
-        btnViaticos.className = "px-4 py-1.5 rounded-xl text-xs font-bold transition-all text-slate-600 hover:text-slate-900";
+        if (btnAdmin) btnAdmin.className = estiloActivo;
+        if (colabBadge) colabBadge.classList.add('hidden');
         if (!colaboradorInspeccionadoId) {
           document.getElementById('admin-subvista-usuarios').classList.remove('hidden');
           document.getElementById('admin-subvista-movimientos').classList.add('hidden');
         }
         cargarUsuariosAdmin();
+      }
+    }
+
+    function cambiarPestana(tab) {
+      mostrarVista(tab);
+    }
+
+    // ==========================================
+    // LÓGICA DE LA PANTALLA DE BIENVENIDA
+    // ==========================================
+    function renderizarSelectBienvenida(empleados) {
+      const select = document.getElementById('welcome-select-colaborador');
+      if (!select) return;
+
+      const valorActual = select.value;
+      select.innerHTML = empleados.map(emp => `
+        <option value="${emp.id}">${emp.nombre} — ${emp.puesto}</option>
+      `).join('');
+
+      if (valorActual && empleados.some(e => e.id === valorActual)) {
+        select.value = valorActual;
+      } else if (empleados.length > 0) {
+        select.value = empleados[0].id;
+      }
+      actualizarPreviaColaboradorBienvenida();
+    }
+
+    function actualizarPreviaColaboradorBienvenida() {
+      const select = document.getElementById('welcome-select-colaborador');
+      if (!select) return;
+      const empId = select.value;
+      const emp = catalogoEmpleados.find(e => e.id === empId);
+      if (!emp) return;
+
+      const avatar = document.getElementById('welcome-preview-avatar');
+      if (avatar) {
+        avatar.className = `w-13 h-13 rounded-2xl bg-gradient-to-tr ${emp.avatarGradient || 'from-emerald-600 to-teal-800'} text-white font-bold text-base flex items-center justify-center shadow-md shrink-0`;
+        avatar.textContent = emp.iniciales || 'EM';
+      }
+
+      const pNombre = document.getElementById('welcome-preview-nombre');
+      if (pNombre) pNombre.textContent = emp.nombre;
+
+      const pPuesto = document.getElementById('welcome-preview-puesto');
+      if (pPuesto) pPuesto.textContent = `${emp.puesto} • ${emp.departamento}`;
+
+      const pDestino = document.getElementById('welcome-preview-destino');
+      if (pDestino) pDestino.innerHTML = `<i class="fa-solid fa-plane-departure text-emerald-600 mr-1.5"></i> ${emp.destino || 'Destino no asignado'}`;
+
+      const pRfc = document.getElementById('welcome-preview-rfc');
+      if (pRfc) pRfc.textContent = `RFC: ${emp.rfc || '--'}`;
+
+      const errorDiv = document.getElementById('welcome-colab-error');
+      if (errorDiv) errorDiv.classList.add('hidden');
+    }
+
+    async function ejecutarIngresoColaboradorBienvenida() {
+      const select = document.getElementById('welcome-select-colaborador');
+      const empId = select ? select.value : null;
+      const clave = document.getElementById('welcome-colab-clave').value.trim();
+      const errorDiv = document.getElementById('welcome-colab-error');
+      const errorTxt = document.getElementById('welcome-colab-error-texto');
+      const btn = document.getElementById('btn-welcome-ingreso-colab');
+
+      if (!empId) {
+        errorDiv.classList.remove('hidden');
+        errorTxt.textContent = 'Por favor selecciona a un colaborador de la lista.';
+        return;
+      }
+
+      if (!clave) {
+        errorDiv.classList.remove('hidden');
+        errorTxt.textContent = 'Por favor ingresa tu clave única de acceso.';
+        document.getElementById('welcome-colab-clave').focus();
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1.5"></i> Validando clave...';
+
+      try {
+        const res = await fetch(`/api/empleados/${empId}/verificar-clave`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ clave })
+        });
+        const json = await res.json();
+
+        if (json.success) {
+          errorDiv.classList.add('hidden');
+          empleadoActualId = empId;
+          sesionDesbloqueada = true;
+          montosVisibles = true;
+
+          const emp = catalogoEmpleados.find(e => e.id === empId);
+          if (emp) {
+            const bAvatar = document.getElementById('colab-banner-avatar');
+            if (bAvatar) {
+              bAvatar.className = `w-12 h-12 rounded-2xl bg-gradient-to-tr ${emp.avatarGradient || 'from-emerald-600 to-teal-800'} text-white font-bold text-sm flex items-center justify-center shadow-md`;
+              bAvatar.textContent = emp.iniciales || 'EM';
+            }
+            const bNombre = document.getElementById('colab-banner-nombre');
+            if (bNombre) bNombre.textContent = emp.nombre;
+            const bSub = document.getElementById('colab-banner-sub');
+            if (bSub) bSub.textContent = `${emp.puesto} • Destino: ${emp.destino || 'Sin asignar'}`;
+            const navNombre = document.getElementById('navbar-colab-nombre');
+            if (navNombre) navNombre.textContent = emp.nombre.split(' ')[0];
+          }
+
+          await cargarViajeEmpleado(empleadoActualId);
+          renderizarSelectorEmpleados(catalogoEmpleados);
+          mostrarVista('viaticos');
+          mostrarToastSincronizacion(`¡Bienvenido, ${emp ? emp.nombre : ''}!`);
+        } else {
+          errorDiv.classList.remove('hidden');
+          errorTxt.textContent = json.mensaje || 'Clave única incorrecta. Verifícala con Administración.';
+          document.getElementById('welcome-colab-clave').select();
+        }
+      } catch (err) {
+        errorDiv.classList.remove('hidden');
+        errorTxt.textContent = 'Error al comunicar con el servidor.';
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<span>Ingresar a mis Viáticos</span><i class="fa-solid fa-arrow-right"></i>';
+      }
+    }
+
+    async function ejecutarLoginAdminBienvenida() {
+      const username = document.getElementById('welcome-admin-user').value.trim();
+      const password = document.getElementById('welcome-admin-pass').value;
+      const errorDiv = document.getElementById('welcome-admin-error');
+      const errorTxt = document.getElementById('welcome-admin-error-texto');
+      const btn = document.getElementById('btn-welcome-ingreso-admin');
+
+      if (!username || !password) {
+        errorDiv.classList.remove('hidden');
+        errorTxt.textContent = 'Ingresa usuario y contraseña de administrador.';
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1.5"></i> Autenticando...';
+
+      try {
+        const res = await fetch('/api/admin/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+        const json = await res.json();
+
+        if (json.success) {
+          errorDiv.classList.add('hidden');
+          adminToken = json.token;
+          localStorage.setItem('viaticos_admin_token', adminToken);
+          setAdminUI(true, json.admin.username);
+          mostrarVista('admin');
+          mostrarToastSincronizacion('¡Sesión de Administrador iniciada!');
+        } else {
+          errorDiv.classList.remove('hidden');
+          errorTxt.textContent = json.mensaje || 'Credenciales inválidas.';
+        }
+      } catch (err) {
+        errorDiv.classList.remove('hidden');
+        errorTxt.textContent = 'Error de conexión con el servidor.';
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-lock-open mr-1"></i><span>Iniciar como Administrador</span>';
+      }
+    }
+
+    function volverABienvenida() {
+      sesionDesbloqueada = false;
+      const claveInput = document.getElementById('welcome-colab-clave');
+      if (claveInput) claveInput.value = '';
+      const errColab = document.getElementById('welcome-colab-error');
+      if (errColab) errColab.classList.add('hidden');
+      const colabBadge = document.getElementById('contenedor-colab-badge');
+      if (colabBadge) colabBadge.classList.add('hidden');
+      mostrarVista('bienvenida');
+    }
+
+    function irALoginAdmin() {
+      if (adminToken) {
+        mostrarVista('admin');
+      } else {
+        mostrarVista('bienvenida');
+        setTimeout(() => {
+          const passAdmin = document.getElementById('welcome-admin-pass');
+          if (passAdmin) {
+            passAdmin.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            passAdmin.focus();
+          }
+        }, 150);
       }
     }
 
@@ -1150,16 +1629,16 @@
       const labelUser = document.getElementById('label-admin-username');
 
       if (esAdmin) {
-        tabAdmin.classList.remove('hidden');
-        triggerLogin.classList.add('hidden');
-        badgeAdmin.classList.remove('hidden');
-        labelUser.textContent = username;
+        if (tabAdmin) tabAdmin.classList.remove('hidden');
+        if (triggerLogin) triggerLogin.classList.add('hidden');
+        if (badgeAdmin) badgeAdmin.classList.remove('hidden');
+        if (labelUser) labelUser.textContent = username;
       } else {
-        tabAdmin.classList.add('hidden');
-        triggerLogin.classList.remove('hidden');
-        badgeAdmin.classList.add('hidden');
+        if (tabAdmin) tabAdmin.classList.add('hidden');
+        if (badgeAdmin) badgeAdmin.classList.add('hidden');
+        if (triggerLogin && !sesionDesbloqueada) triggerLogin.classList.remove('hidden');
         if (!document.getElementById('vista-admin').classList.contains('hidden')) {
-          cambiarPestana('viaticos');
+          mostrarVista('bienvenida');
         }
       }
     }
@@ -1200,7 +1679,7 @@
           localStorage.setItem('viaticos_admin_token', adminToken);
           cerrarModalLoginAdmin();
           setAdminUI(true, json.admin.username);
-          cambiarPestana('admin');
+          mostrarVista('admin');
         } else {
           errorDiv.classList.remove('hidden');
           errorTxt.textContent = json.mensaje || 'Credenciales inválidas';
@@ -1225,7 +1704,7 @@
       colaboradorInspeccionadoId = null;
       localStorage.removeItem('viaticos_admin_token');
       setAdminUI(false);
-      cambiarPestana('viaticos');
+      mostrarVista('bienvenida');
     }
 
     // ==========================================
@@ -1587,6 +2066,7 @@
         if (json.success) {
           catalogoEmpleados = json.empleados;
           renderizarSelectorEmpleados(catalogoEmpleados);
+          renderizarSelectBienvenida(catalogoEmpleados);
         }
       } catch (err) {
         console.error('Error cargando empleados:', err);
@@ -1715,8 +2195,29 @@
           sesionDesbloqueada = true;
           montosVisibles = true;
           cerrarModalClave();
+
+          const emp = catalogoEmpleados.find(e => e.id === empleadoActualId);
+          if (emp) {
+            const bAvatar = document.getElementById('colab-banner-avatar');
+            if (bAvatar) {
+              bAvatar.className = `w-12 h-12 rounded-2xl bg-gradient-to-tr ${emp.avatarGradient || 'from-emerald-600 to-teal-800'} text-white font-bold text-sm flex items-center justify-center shadow-md`;
+              bAvatar.textContent = emp.iniciales || 'EM';
+            }
+            const bNombre = document.getElementById('colab-banner-nombre');
+            if (bNombre) bNombre.textContent = emp.nombre;
+            const bSub = document.getElementById('colab-banner-sub');
+            if (bSub) bSub.textContent = `${emp.puesto} • Destino: ${emp.destino || 'Sin asignar'}`;
+            const navNombre = document.getElementById('navbar-colab-nombre');
+            if (navNombre) navNombre.textContent = emp.nombre.split(' ')[0];
+            const colabBadge = document.getElementById('contenedor-colab-badge');
+            if (colabBadge) colabBadge.classList.remove('hidden');
+            const triggerLogin = document.getElementById('contenedor-login-trigger');
+            if (triggerLogin) triggerLogin.classList.add('hidden');
+          }
+
           renderizarSelectorEmpleados(catalogoEmpleados);
           await cargarViajeEmpleado(empleadoActualId);
+          mostrarToastSincronizacion(`¡Sesión iniciada como ${emp ? emp.nombre : ''}!`);
         } else {
           errorDiv.classList.remove('hidden');
           errorTxt.textContent = json.mensaje || 'Clave única incorrecta.';
