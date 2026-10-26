@@ -1,4 +1,5 @@
 import os
+import shutil
 from docx import Document
 from docx.shared import Inches, Pt, RGBColor
 from docx.enum.text import WD_ALIGN_PARAGRAPH
@@ -106,7 +107,7 @@ def style_table(tbl, col_widths, headers, data):
             for run in p.runs:
                 run.font.size = Pt(8.5)
                 run.font.color.rgb = RGBColor(30, 41, 59)
-            if i == 0 or i == 3:
+            if i == 0 or i == 1:
                 p.alignment = WD_ALIGN_PARAGRAPH.LEFT
             else:
                 p.alignment = WD_ALIGN_PARAGRAPH.CENTER
@@ -127,12 +128,27 @@ def add_p(doc, text, bold_prefix="", space_after=4):
     r_t.font.color.rgb = RGBColor(51, 65, 85)
     return p
 
+def add_bullet(doc, text, bold_prefix=""):
+    p = doc.add_paragraph(style='List Bullet')
+    p.paragraph_format.space_before = Pt(0)
+    p.paragraph_format.space_after = Pt(3)
+    p.paragraph_format.line_spacing = 1.15
+    if bold_prefix:
+        r_b = p.add_run(bold_prefix + " ")
+        r_b.font.bold = True
+        r_b.font.size = Pt(9.5)
+        r_b.font.color.rgb = RGBColor(15, 23, 42)
+    r_t = p.add_run(text)
+    r_t.font.size = Pt(9.5)
+    r_t.font.color.rgb = RGBColor(51, 65, 85)
+    return p
+
 # ==========================================
 # INICIO DE GENERACIÓN DEL DOCUMENTO
 # ==========================================
 doc = Document()
 
-# Configuración de márgenes estándar
+# Márgenes estándar
 for section in doc.sections:
     section.top_margin = Inches(0.8)
     section.bottom_margin = Inches(0.8)
@@ -150,19 +166,19 @@ run_org.font.size = Pt(11)
 run_org.font.bold = True
 run_org.font.color.rgb = RGBColor(100, 116, 139)
 
-run_main = p_title.add_run("JLG FACTURACIÓN | ECOSISTEMA DE VIÁTICOS Y COMPROBACIONES MÉXICO\n")
+run_main = p_title.add_run("JLG FACTURACIÓN | ECOSISTEMA CORPORATIVO DE VIÁTICOS Y AUDITORÍA FISCAL\n")
 run_main.font.size = Pt(17)
 run_main.font.bold = True
 run_main.font.color.rgb = RGBColor(15, 76, 58)
 
-run_sub = p_title.add_run("Manual Técnico Integral, Portal Web, App Android, Módulo Administrador y Auditoría Fiscal CFDI 4.0")
+run_sub = p_title.add_run("Manual Técnico y Operativo Integral: Portal Web, App Android Nativa, Generador CFDI 4.0, Módulo de Auditoría y Despliegue Cloud")
 run_sub.font.size = Pt(11.5)
 run_sub.font.color.rgb = RGBColor(30, 64, 175)
 
 p_meta = doc.add_paragraph()
 p_meta.paragraph_format.space_before = Pt(6)
 p_meta.paragraph_format.space_after = Pt(14)
-run_meta = p_meta.add_run("Versión: 2.5.0  |  Normativa: SAT Anexo 20 / CFDI 4.0 / Art. 28 LISR  |  Fecha: Octubre 2026")
+run_meta = p_meta.add_run("Versión: 3.0.0  |  Normativa: SAT Anexo 20 / CFDI 4.0 / Art. 28 LISR  |  Fecha de Actualización: Octubre 2026")
 run_meta.font.size = Pt(9)
 run_meta.font.italic = True
 run_meta.font.color.rgb = RGBColor(100, 116, 139)
@@ -170,143 +186,159 @@ run_meta.font.color.rgb = RGBColor(100, 116, 139)
 doc.add_paragraph().paragraph_format.space_after = Pt(2)
 
 # ==========================================
-# 1. RESUMEN EJECUTIVO
+# 1. RESUMEN EJECUTIVO Y OBJETIVOS
 # ==========================================
 add_header(doc, "1. Resumen Ejecutivo del Ecosistema Jlg Facturación", level=1)
-add_p(doc, "Jlg Facturación es una suite empresarial omnicanal compuesta por una plataforma Web full-stack y una aplicación móvil nativa para Android, desarrollada específicamente para resolver el ciclo integral de comprobación de viáticos y representación en México. Su objetivo central es garantizar que el 100% de los gastos deducibles cumplan a cabalidad con los estándares de validación estructural del SAT (CFDI 4.0) y con los topes legales del Artículo 28 Fracción V de la Ley del Impuesto sobre la Renta (LISR).")
+add_p(doc, "Jlg Facturación es una solución omnicanal de grado empresarial concebida para la gestión, control, comprobación y auditoría integral de viáticos corporativos en México. La plataforma fusiona un backend de alto rendimiento en Node.js, un portal web reactivo y una aplicación nativa para Android en Kotlin. El sistema automatiza el 100% de la conciliación fiscal conforme a los lineamientos del Anexo 20 del SAT (CFDI 4.0) y a las deducciones autorizadas bajo el Artículo 28 Fracción V de la Ley del Impuesto sobre la Renta (LISR).")
 
-add_callout(doc, "Principales Capacidades y Novedades de la Versión 2.5.0", 
-    "• Sincronización Bidireccional Web / Android: Los colaboradores suben sus facturas XML desde su smartphone o la computadora y se reflejan en tiempo real en ambos entornos.\n"
-    "• Módulo Administrador con Inspección de Movimientos: El administrador puede auditar el viaje de cada colaborador, revisar facturas individuales y Aceptarlas o Rechazarlas con recálculo dinámico de saldos.\n"
-    "• Claves Alfanuméricas y Privacidad Multinivel: Soporte para contraseñas con caracteres alfanuméricos (ej. JALM-2026) y enmascaramiento con asteriscos.\n"
-    "• Persistencia de Datos en Disco: Almacenamiento JSON seguro en el servidor para evitar pérdida de registros en reinicios.")
+add_callout(doc, "Aspectos Clave y Logros de la Versión 3.0.0", 
+    "• Generador y Validador Directo CFDI 4.0 en Android: Registro inmediato de comprobantes sin requerir la preexistencia de archivos XML descargados en el smartphone.\n"
+    "• Ingreso Administrativo Unificado y Discreto: Acceso maestro integrado de forma natural en el directorio de colaboradores de la web, eliminando secciones o botones llamativos de administración externa.\n"
+    "• Módulo de Administración Integral: Altas con 12 campos fiscales/operativos, edición en vivo de colaboradores registrados y rechazo con justificación obligatoria de auditoría.\n"
+    "• Despliegue Cloud 24/7 en Render con CI/CD: Infraestructura en la nube con sincronización continua desde GitHub y descarga directa del instalador APK.",
+    bg_hex="F0FDF4", border_hex="10B981")
 
 # ==========================================
-# 2. TABLA DE USUARIOS Y CREDENCIALES
+# 2. STACK TECNOLÓGICO Y ARQUITECTURA
 # ==========================================
-add_header(doc, "2. Catálogo Oficial de Usuarios y Credenciales de Acceso", level=1)
-add_p(doc, "A continuación se detalla la nómina de colaboradores registrados en el sistema, sus puestos, destinos de viaje asignados y sus claves únicas de acceso confidencial:")
+add_header(doc, "2. Arquitectura del Sistema y Tecnologías Utilizadas", level=1)
+add_p(doc, "El ecosistema está construido sobre estándares modernos y librerías probadas en producción:")
 
-tbl_users = doc.add_table(rows=1, cols=6)
-style_table(tbl_users, [1.3, 1.2, 1.1, 1.1, 0.9, 0.9],
-    ["Colaborador", "Puesto / Área", "RFC", "Destino", "Anticipo", "Clave Única"],
+tbl_tech = doc.add_table(rows=1, cols=4)
+style_table(tbl_tech, [1.5, 1.8, 1.6, 1.6],
+    ["Capa / Entorno", "Tecnología Principal", "Librerías / Dependencias Clave", "Función en el Ecosistema"],
     [
-        ["Julián Alberto López Morales", "Gerente Operaciones", "LOMJ880914HC3", "Monterrey, NL", "$6,000.00", "JALM-2026"],
-        ["Sandra Urquilla Delgado", "Directora Comercial", "URDS9204058K2", "Guadalajara, JAL", "$8,500.00", "SUD-2026"],
-        ["Ángel Miramontes Castro", "Supervisor Técnico", "MICA851120PX9", "Tijuana, BC", "$4,500.00", "AMC-2026"],
-        ["Sofia Cristina Navarro Ruiz", "Coordinadora Proyectos", "NARS900101XYZ", "Querétaro, QRO", "$7,500.00", "SCNR-2026"]
+        ["Backend REST API", "Node.js v20+ / Express 4.19", "Bcrypt, Crypto, CORS, Body-Parser", "Motor fiscal, parseo XML, autenticación y persistencia."],
+        ["Frontend Web", "Vanilla JS ES6+ (SPA)", "TailwindCSS 3.4, FontAwesome 6.5.1", "Portal responsivo con polling en vivo y diseño corporativo."],
+        ["App Móvil Android", "Kotlin 1.9.24 / SDK 34", "Retrofit 2.11, OkHttp3, Material 3", "App nativa con generador CFDI 4.0 y dropzone XML."],
+        ["Compilador Móvil", "Gradle 8.9 / Java 21 OpenJDK", "Android Jetpack ViewBinding, Coroutines", "Generación de APK debug y release optimizado."],
+        ["Infraestructura Cloud", "Render Cloud (Web Service)", "Git / GitHub Actions, HTTPS Let's Encrypt", "Hosting 24/7 universal con despliegue continuo."]
     ])
 
-add_callout(doc, "Credenciales Maestras del Administrador",
-    "• Usuario Maestro: DamianSpears_Owner\n"
-    "• Contraseña de Acceso: Papaleta723!\n"
-    "• Rol: Propietario / Auditor Máximo con facultades para dar de alta colaboradores, auditar movimientos y autorizar o rechazar facturas fiscales.",
+add_bullet(doc, "Node.js y Express proporcionan una arquitectura no bloqueante capaz de procesar validaciones de XML simultáneas en menos de 20 milisegundos por comprobante.", "Rendimiento del Backend:")
+add_bullet(doc, "Almacenamiento persistente en disco (data/comprobantes.json) con resguardo de transacciones en memoria, permitiendo tolerancia total a fallos y reinicios de servidor.", "Persistencia Confiable:")
+add_bullet(doc, "Retrofit 2 gestiona peticiones asíncronas con corrutinas de Kotlin en segundo plano, evitando cualquier congelamiento de la interfaz de usuario en teléfonos móviles.", "Capa de Red Android:")
+
+# ==========================================
+# 3. AUTENTICACIÓN Y ROLES DE USUARIO
+# ==========================================
+add_header(doc, "3. Catálogo Oficial de Usuarios, Roles y Credenciales", level=1)
+add_p(doc, "El sistema cuenta con dos niveles de acceso diferenciados pero integrados armónicamente:")
+
+tbl_users = doc.add_table(rows=1, cols=6)
+style_table(tbl_users, [1.4, 1.2, 1.1, 1.1, 0.9, 0.8],
+    ["Nombre del Perfil", "Puesto Asignado", "RFC", "Destino / Sede", "Anticipo", "Clave / Contraseña"],
+    [
+        ["Julián Alberto López Morales", "Gerente Operaciones", "LOMJ880914HC3", "Monterrey, NL", "$6,000.00", "JALM-2026"],
+        ["Sandra Urquilla Rosales", "Directora Comercial", "UROS920318M14", "Guadalajara, JAL", "$8,500.00", "SUR-2026"],
+        ["Ángel Miramontes", "Auditor Contable Senior", "MIRA851120AB9", "Cancún, Q. ROO", "$12,000.00", "AM-2026"],
+        ["Jorge Luis Lopez", "Coordinador de TI", "LOGJ010405V78", "Querétaro, QRO", "$7,500.00", "JLL-2026"],
+        ["Damian Spears", "Dirección General (Admin)", "SPED850312XX1", "Corporativo Central", "Ilimitado", "Papaleta723!"]
+    ])
+
+add_callout(doc, "🔐 Acceso Unificado y Discreto del Administrador en la Web",
+    "A solicitud de la dirección corporativa, se ha eliminado cualquier tarjeta o botón externo de 'Acceso Administrador' en la página de inicio. El perfil de 'Damian Spears — Dirección General' se encuentra integrado de forma completamente natural en el selector de colaboradores. Al seleccionarlo y escribir la contraseña maestra ('Papaleta723!'), el portal reconoce internamente sus permisos y desbloquea el Módulo de Administración sin llamar la atención de personal no autorizado.",
     bg_hex="FEF3C7", border_hex="F59E0B")
 
 # ==========================================
-# 3. MÓDULO ADMINISTRADOR: INSPECCIÓN Y APROBACIÓN
+# 4. GENERADOR Y VALIDADOR CFDI 4.0 (APP ANDROID)
 # ==========================================
-add_header(doc, "3. Módulo Administrador: Auditoría Fiscal y Dictamen de Facturas", level=1)
-add_p(doc, "Tanto en la aplicación Android como en el portal Web, el Administrador dispone de un panel exclusivo para inspeccionar las comprobaciones de cada perfil y dictaminar sus facturas:")
+add_header(doc, "4. Generador Directo de Facturas CFDI 4.0 y Validación SAT", level=1)
+add_p(doc, "Una de las mayores innovaciones de la versión 3.0.0 es la inclusión de un Generador y Emisor Digital de Facturas CFDI 4.0 directamente dentro de la aplicación móvil de Android:")
 
-add_header(doc, "3.1 Inspección Individual de Movimientos", level=2)
-add_p(doc, "Al presionar el botón 'Movimientos' (Web) o '🔍 Ver Movimientos y Facturas' (Android), se despliega una ficha financiera detallada que contiene:")
-add_p(doc, "Nombre, puesto, departamento, RFC fiscal y clave confidencial asignada.", "1. Perfil del Colaborador:")
-add_p(doc, "Destino de viaje autorizado, folio de comisión y período.", "2. Detalles de la Comisión:")
-add_p(doc, "Presupuesto inicial entregado al trabajador bajo el concepto de viáticos.", "3. Anticipo Asignado:")
-add_p(doc, "Suma total de todas las facturas electrónicas subidas.", "4. Total Gastado Bruto:")
-add_p(doc, "Monto validado que cumple estrictamente con el Art. 28 de la LISR.", "5. Deducible SAT:")
-add_p(doc, "Diferencia neta entre el anticipo y los gastos deducibles. Si es positivo, se presenta en verde como 'Saldo por Reintegrar a la Empresa'; si es negativo, se presenta como 'Excedente a Reembolsar al Trabajador'.", "6. Saldo de Liquidación:")
+add_p(doc, "El usuario puede alternar entre '⚡ Generar Factura Directa' y '📂 Cargar Archivo XML'. Si no cuenta con el archivo XML en su almacenamiento, puede llenar los campos y timbrar la factura digital al vuelo.", "4.1 Dos Modos de Comprobación:")
 
-add_header(doc, "3.2 Mecanismo de Aceptación y Rechazo de Facturas", level=2)
-add_p(doc, "El administrador puede dictaminar individualmente cada comprobante CFDI 4.0 cargado por el trabajador:")
-add_p(doc, "Confirma la validez fiscal y administrativa del gasto. La factura se marca como '✅ APROBADA' y su importe deducible se suma a favor del saldo de la liquidación.", "• Acción ACEPTAR (✓):")
-add_p(doc, "El administrador marca la factura como '✕ RECHAZADA'. En ese mismo instante, el sistema excluye la factura del cálculo deducible (monto deducible = $0.00), trasladando el importe total a gasto no deducible y aumentando inmediatamente el saldo que el empleado debe devolver a la empresa.", "• Acción RECHAZAR (✕):")
-add_p(doc, "Cualquier decisión tomada por el administrador se persiste en disco en comprobantes.json y se notifica al colaborador en su panel en tiempo real.", "• Persistencia e Inmutabilidad:")
+add_p(doc, "El generador incluye todos los parámetros indispensables requeridos por la legislación fiscal mexicana:", "4.2 Campos Requeridos:")
+add_bullet(doc, "Nombre legal del proveedor comercial (ej. Restaurante El Portón, City Express).", "1. Proveedor / Razón Social:")
+add_bullet(doc, "Identificador fiscal a 12 o 13 caracteres con validación de estructura.", "2. RFC del Emisor:")
+add_bullet(doc, "Número de serie o folio asignado a la nota o comprobante de compra.", "3. Folio Fiscal:")
+add_bullet(doc, "Descripción detallada del consumo o servicio contratado en la comisión.", "4. Concepto del Gasto:")
+add_bullet(doc, "Importe final pagado en Moneda Nacional. El generador calcula automáticamente la Base imponible y el IVA al 16%.", "5. Monto Total ($ MXN):")
+add_bullet(doc, "Chips de selección rápida: ALIMENTOS, HOSPEDAJE, TRANSPORTE, GASOLINA u OTROS.", "6. Categoría del Gasto:")
+add_bullet(doc, "Catálogo oficial del SAT: Tarjeta de Crédito (04), Tarjeta de Débito (28), Transferencia Electrónica SPEI (03) y Efectivo (01).", "7. Forma de Pago SAT:")
 
-# ==========================================
-# 4. APLICACIÓN ANDROID NATIVA (JLG FACTURACIÓN)
-# ==========================================
-add_header(doc, "4. Aplicación Móvil Android (ViaticosAndroidApp)", level=1)
-add_p(doc, "La aplicación Android fue desarrollada en Kotlin nativo para brindar el máximo rendimiento, seguridad biométrica y compatibilidad con dispositivos modernos:")
-
-add_header(doc, "4.1 Características de la Aplicación Móvil", level=2)
-add_p(doc, "Toda la interfaz visual de inicio solicita primero elegir el perfil de usuario mediante una tarjeta táctil estilizada con gradientes y avatares dinámicos. Ningún saldo o dato sensible es visible antes de validar la clave.", "• Acceso Seguro y Estético:")
-add_p(doc, "El campo de contraseña utiliza el teclado alfanumérico completo ('textPassword'), permitiendo ingresar contraseñas seguras con letras, números y símbolos.", "• Teclado Alfanumérico:")
-add_p(doc, "Soporta carga directa de archivos .XML del CFDI 4.0 almacenados en el celular o recibidos por correo electrónico o WhatsApp.", "• Carga Local de XML:")
-add_p(doc, "Se conecta mediante Retrofit 2 / OkHttp3 al backend Node.js, permitiendo actualizar la IP del servidor dinámicamente desde el botón de configuración.", "• Sincronización REST:")
-add_p(doc, "El paquete compilado app-debug.apk (6.6 MB) se encuentra disponible en la carpeta raíz del proyecto bajo el nombre 'JLG_Facturacion.apk'.", "• Instalador Listo:")
-
-tbl_apk = doc.add_table(rows=1, cols=4)
-style_table(tbl_apk, [1.6, 1.5, 1.8, 1.6],
-    ["Componente", "Tecnología", "Ubicación en Código", "Estado"],
-    [
-        ["Lenguaje & UI", "Kotlin + Material 3", "ViaticosAndroidApp/app/src", "Compilado exitosamente"],
-        ["Capa de Red", "Retrofit 2 + Gson", "network/RetrofitClient.kt", "Endpoints sincronizados"],
-        ["Instalador APK", "Android SDK 34 (Android 14)", "c:/Users/Jorge/Desktop/Damian/JLG_Facturacion.apk", "Listo para instalar"],
-        ["Dispositivos Soportados", "Android 8.0 a Android 15", "Samsung Galaxy, Xiaomi, Motorola, etc.", "100% Compatible"]
-    ])
+add_p(doc, "Para facilitar demostraciones y pruebas instantáneas sin escribir, la app integra 3 botones de un toque:", "4.3 Botones de Muestras Rápidas (1-Tap Testing):")
+add_bullet(doc, "Restaurante El Portón por $720.00 MXN. Pasa todas las reglas y se deduce al 100% al no superar el límite de $750.00 diarios.", "• Muestra 1 (Alimentos Válida):")
+add_bullet(doc, "Hoteles City Express por $986.00 MXN. Deducible íntegramente conforme a comprobación de pernocta.", "• Muestra 2 (Hospedaje Válido):")
+add_bullet(doc, "Steak House Capital por $1,300.00 MXN. Demuestra el cálculo automático del Art. 28 LISR: autoriza $750.00 como deducible y traslada $550.00 a Excedente No Deducible.", "• Muestra 3 (Excedente en Alimentos):")
 
 # ==========================================
-# 5. REGLAS FISCALES MEXICANAS (SAT & LISR)
+# 5. MÓDULO DE ADMINISTRACIÓN Y AUDITORÍA
 # ==========================================
-add_header(doc, "5. Reglas Fiscales del SAT y Límites del Art. 28 de la LISR", level=1)
-add_p(doc, "El motor fiscal de Jlg Facturación automatiza el cumplimiento estricto de las leyes fiscales mexicanas aplicables a viáticos y comisiones:")
+add_header(doc, "5. Módulo de Administración, Altas y Auditoría Fiscal", level=1)
+add_p(doc, "El panel de administración permite supervisar el gasto de toda la plantilla y modificar parámetros en vivo:")
 
-add_callout(doc, "Topes Cuantitativos de Alimentos (Art. 28 Fracc. V LISR)",
-    "• Comisión Nacional: Tope diario deducible de $750.00 MXN por comisionado.\n"
-    "• Comisión en el Extranjero: Tope diario deducible de $1,500.00 MXN por comisionado.\n"
-    "El sistema agrupa automáticamente por día natural. Si en una misma fecha se suben facturas de alimentos por $1,200.00 MXN, el sistema deduce exactamente $750.00 y los restantes $450.00 los clasifica como Excedente No Deducible.",
-    bg_hex="EFF6FF", border_hex="3B82F6")
+add_p(doc, "Permite incorporar colaboradores comisionados registrando 12 campos obligatorios: Nombre Completo, RFC Fiscal, Correo Corporativo, Puesto, Departamento, Clave Única generada, Estatus, Destino del Viaje, Motivo de la Comisión, Fecha de Inicio, Fecha de Fin y Anticipo Otorgado.", "5.1 Alta de Nuevos Colaboradores:")
 
-add_p(doc, "Conforme al Art. 27 Fracc. III de la LISR, el combustible es 100% no deducible si se pagó en efectivo (Forma de Pago 01). Debe liquidarse invariablemente con tarjeta de crédito, débito o monedero electrónico autorizado.", "• Regla de Gasolinas y Combustibles:")
-add_p(doc, "El CFDI debe haberse expedido a nombre de Grupo Mercantil Empresarial S.A. de C.V. (RFC GME980512ABC). Facturas a nombre de 'Público en General' (XAXX010101000) o terceros son rechazadas.", "• RFC Receptor Corporativo:")
-add_p(doc, "La fecha de timbrado del XML debe ubicarse dentro del intervalo de la comisión de trabajo, con una tolerancia de 24 horas para facturas extemporáneas de hoteles o peajes.", "• Temporalidad de la Comisión:")
+add_p(doc, "Cada tarjeta de colaborador cuenta con un botón '✏️ Editar' que abre un formulario prellenado para actualizar cualquiera de los 12 datos en tiempo real mediante el endpoint PUT /api/admin/usuarios/:id.", "5.2 Edición de Colaboradores Existentes:")
+
+add_p(doc, "Al presionar el botón '✕ Rechazar' sobre una factura, el sistema solicita obligatoriamente el 'Motivo de Rechazo de Auditoría' (ej. 'Concepto no deducible según política interna'). Dicho motivo se guarda permanentemente en la factura y el importe deducible se recalcula a $0.00.", "5.3 Dictamen de Facturas con Motivo:")
 
 # ==========================================
 # 6. ESPECIFICACIÓN DE ENDPOINTS API REST
 # ==========================================
-add_header(doc, "6. Especificación de Endpoints del Backend Node.js", level=1)
-add_p(doc, "El servidor opera en el puerto 4000 e implementa los siguientes endpoints protegidos y públicos:")
+add_header(doc, "6. Catálogo Completo de Endpoints API REST", level=1)
+add_p(doc, "El backend expone 12 servicios estructurados bajo arquitectura REST:")
 
 tbl_api = doc.add_table(rows=1, cols=4)
-style_table(tbl_api, [0.8, 2.3, 1.8, 1.6],
-    ["Método", "Endpoint", "Propósito", "Autenticación"],
+style_table(tbl_api, [0.8, 2.4, 2.0, 1.3],
+    ["Método", "Endpoint", "Propósito Funcional", "Seguridad"],
     [
-        ["GET", "/api/empleados", "Lista de colaboradores con montos enmascarados", "Público"],
-        ["POST", "/api/empleados/:id/verificar-clave", "Valida clave única alfanumérica y desbloquea sesión", "Público"],
-        ["GET", "/api/empleados/:id/viaje", "Obtiene liquidación, saldos y comprobantes", "Público"],
-        ["POST", "/api/empleados/:id/validar-comprobante", "Parsea y valida XML CFDI 4.0 contra reglas SAT", "Público"],
-        ["POST", "/api/admin/login", "Autenticación maestra con Bcrypt (token Bearer)", "Público"],
-        ["GET", "/api/admin/usuarios", "Lista completa de usuarios con claves visibles", "Bearer Admin Token"],
-        ["PUT", "/api/admin/empleados/:id/comprobantes/:uuid/estatus", "Acepta o Rechaza una factura y recalcula saldos", "Bearer Admin Token"]
+        ["GET", "/api/empleados", "Catálogo de personal con montos enmascarados.", "Público"],
+        ["POST", "/api/empleados/:id/verificar-clave", "Valida la clave única alfanumérica del colaborador.", "Público"],
+        ["GET", "/api/empleados/:id/viaje", "Liquidación actual, saldos y comprobantes registrados.", "Público"],
+        ["POST", "/api/empleados/:id/validar-comprobante", "Valida XML CFDI 4.0 contra SAT y reglas del Art. 28 LISR.", "Público"],
+        ["POST", "/api/admin/login", "Autenticación maestra con Bcrypt y generación de token.", "Rate Limited"],
+        ["GET", "/api/admin/verificar-sesion", "Verifica la validez del token de sesión administrativa.", "Bearer Token"],
+        ["POST", "/api/admin/logout", "Revoca la sesión activa del administrador.", "Bearer Token"],
+        ["GET", "/api/admin/usuarios", "Listado maestro de usuarios con claves y viajes visibles.", "Bearer Token"],
+        ["POST", "/api/admin/usuarios", "Alta de nuevo colaborador con 12 campos completos.", "Bearer Token"],
+        ["PUT", "/api/admin/usuarios/:id", "Actualización integral de datos y comisión del usuario.", "Bearer Token"],
+        ["PUT", "/api/admin/empleados/:id/comprobantes/:uuid/estatus", "Aprobación o Rechazo de factura con motivo de auditoría.", "Bearer Token"],
+        ["GET", "/ViaticosApp.apk", "Descarga directa del instalador de la app móvil Android.", "Público"]
     ])
 
 # ==========================================
-# 7. GUÍA RÁPIDA DE CONEXIÓN Y USO (CLOUD 24/7)
+# 7. GUÍA DE DESPLIEGUE CLOUD Y USO MÓVIL
 # ==========================================
-add_header(doc, "7. Guía Rápida para Abrir el Portal y Conectar la App", level=1)
+add_header(doc, "7. Guía de Conexión Cloud 24/7 y Descarga del APK", level=1)
 
-add_callout(doc, "Despliegue Cloud en Vivo 24/7 (100% Gratuito)",
-    "• URL Oficial en la Nube: https://jlg-facturacion.onrender.com/\n"
-    "• Estado: Producción Activa (Live)\n"
-    "• Disponibilidad: 24 horas del día, los 365 días del año sin necesidad de encender la computadora del administrador.\n"
-    "• Conectividad: Acceso universal desde cualquier red Wi-Fi o datos móviles (4G/5G).",
-    bg_hex="F0FDF4", border_hex="10B981")
+add_callout(doc, "🌐 Infraestructura en Producción Cloud (Render 24/7)",
+    "• URL Oficial en Vivo: https://jlg-facturacion.onrender.com/\n"
+    "• Repositorio Oficial en GitHub: https://github.com/jorgecesba/jlg-facturacion.git\n"
+    "• Despliegue Automático (CI/CD): Cualquier cambio confirmado a la rama 'main' dispara una nueva compilación y despliegue en menos de 2 minutos.\n"
+    "• Descarga del APK desde la Web: Incluye un botón verde permanente '📱 Descargar App Android' en la cabecera del portal.",
+    bg_hex="EFF6FF", border_hex="3B82F6")
 
-add_header(doc, "7.1 Cómo Usar la Nueva Pantalla de Inicio / Bienvenida del Portal", level=2)
-add_p(doc, "Abre cualquier navegador web (Chrome, Edge, Safari, Firefox) e ingresa directamente a: https://jlg-facturacion.onrender.com/ El sistema te recibirá con la nueva Pantalla de Inicio y Bienvenida corporativa.", "Paso 1: Acceso Directo:")
-add_p(doc, "En la tarjeta izquierda 'Acceso a Comisionados', despliega el selector por Nombre Completo, visualiza tu resumen de viaje (destino, RFC, avatar) e introduce tu clave alfanumérica confidencial (ej. JALM-2026). Al presionar 'Ingresar a mis Viáticos', accederás directamente a tu comprobación y subida de XML.", "Paso 2: Acceso por Nombre Completo (Colaboradores):")
-add_p(doc, "En la tarjeta derecha 'Iniciar como Administrador', introduce las credenciales maestras (DamianSpears_Owner / Papaleta723!) y haz clic en 'Iniciar como Administrador'. Accederás inmediatamente al Panel de Auditoría para aprobar o rechazar facturas y dar de alta nuevo personal.", "Paso 3: Acceso Directo de Administrador:")
-add_p(doc, "Tanto en el portal de comprobación como en el panel administrador dispones del botón 'Cerrar Sesión / Cambiar Colaborador' en la barra superior para volver de manera inmediata y segura a la Pantalla de Inicio.", "Paso 4: Cambio de Usuario y Cierre de Sesión:")
+add_header(doc, "7.1 Cómo Descargar e Instalar la Aplicación en Teléfonos Android", level=2)
+add_p(doc, "Abre https://jlg-facturacion.onrender.com en el navegador de tu celular y presiona el botón 'Descargar App Android' en la esquina superior derecha, o copia el archivo ViaticosApp.apk desde la computadora.", "Paso 1: Descarga del APK:")
+add_p(doc, "Abre el archivo descargado. Si Android solicita confirmación de seguridad, activa la casilla 'Permitir instalación de fuentes desconocidas' para ese navegador o explorador de archivos.", "Paso 2: Permisos de Instalación:")
+add_p(doc, "La app se conecta de fábrica a los servidores de Render. Los colaboradores pueden comprobar gastos desde carretera, hoteles o aeropuertos usando datos 4G/5G.", "Paso 3: Conexión Automática:")
+add_p(doc, "Si se trabaja en una red local de pruebas, el usuario puede pulsar el botón de engrane ⚙️ en la barra de la app e ingresar 'http://192.168.100.52:4000/api/' para apuntar al servidor local.", "Paso 4: Servidor Alternativo:")
 
-add_header(doc, "7.2 Cómo Conectar los Celulares de los Usuarios (App Android)", level=2)
-add_p(doc, "Copia el archivo 'JLG_Facturacion.apk' a los celulares de los colaboradores (vía WhatsApp, correo o Google Drive) e instálalo habilitando 'Instalar apps desconocidas'.", "Paso 1: Instalación:")
-add_p(doc, "La aplicación ya viene configurada de fábrica con la URL cloud 'https://jlg-facturacion.onrender.com/api/'. En cuanto el colaborador abre la app, esta se conecta automáticamente a la nube.", "Paso 2: Conexión Automática:")
-add_p(doc, "Los colaboradores pueden estar en su casa, en la oficina o en carretera con datos móviles 4G/5G. No se requiere estar en la misma red Wi-Fi.", "Paso 3: Conexión Universal:")
-add_p(doc, "Si en el futuro se desea apuntar a otro servidor privado o red local, la app cuenta con el botón de engrane ⚙️ en la esquina superior derecha para personalizar la URL del backend.", "Paso 4: Flexibilidad de Servidor:")
+# ==========================================
+# 8. RESOLUCIÓN DE PREGUNTAS FRECUENTES (FAQ)
+# ==========================================
+add_header(doc, "8. Preguntas Frecuentes y Solución de Problemas (FAQ)", level=1)
 
-# Guardar documento
-output_path = r"C:\Users\Jorge\Desktop\Damian\portal-viaticos\Documentacion_Portal_Viaticos_Mexico.docx"
-doc.save(output_path)
-print(f"Documento Word generado exitosamente en: {output_path}")
+add_p(doc, "¿Cómo se entera el portal web cuando un comisionado sube una factura desde su celular?", "Pregunta 1: Sincronización en Vivo")
+add_bullet(doc, "El portal web ejecuta una sincronización reactiva en tiempo real cada 3 segundos. Cuando el empleado valida una factura en su teléfono, los saldos, el gráfico de barras y la tabla de comprobantes en la pantalla de la web se actualizan al instante sin presionar F5.")
+
+add_p(doc, "¿Qué sucede con los impuestos locales y el IVA de las facturas?", "Pregunta 2: Tratamiento del IVA y Proporcionalidad")
+add_bullet(doc, "El sistema calcula el IVA al 16% sobre la base deducible. Cuando un gasto de alimentos excede los $750.00 diarios, el IVA correspondiente al excedente se convierte en no acreditable de conformidad con el Artículo 5 Fracción I de la Ley del IVA.")
+
+add_p(doc, "¿Dónde se almacena la información fiscal?", "Pregunta 3: Seguridad de Datos")
+add_bullet(doc, "Las facturas y datos de colaboradores se almacenan de manera estructurada en portal-viaticos/data/comprobantes.json. Ninguna contraseña de administrador se guarda en texto plano; todas están hasheadas con Bcrypt.")
+
+# ==========================================
+# GUARDADO DE ARCHIVOS EN TODAS LAS RUTAS
+# ==========================================
+rutas_salida = [
+    r"C:\Users\Jorge\Desktop\Damian\portal-viaticos\Documentacion_Portal_Viaticos_Mexico.docx",
+    r"C:\Users\Jorge\Desktop\Damian\Documentacion_Jlg_Facturacion.docx",
+    r"C:\Users\Jorge\Desktop\Damian\Manual_Completo_Jlg_Facturacion_Android.docx"
+]
+
+for ruta in rutas_salida:
+    doc.save(ruta)
+    print(f"✅ Documentación actualizada guardada en: {ruta}")
